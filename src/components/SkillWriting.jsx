@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { writingData } from "../data/vocabulary";
 import { etymologyData, radicalsList } from "../data/etymologyData";
 
@@ -8,9 +8,19 @@ export default function SkillWriting({
   addXp,
   triggerMascot,
   playSound,
-  streak
+  streak,
+  customWords = [],
+  onAddCustomWord,
+  onRemoveCustomWord
 }) {
-  const filteredWritingData = writingData.filter((item) => item.level === selectedLevel);
+  const combinedWritingData = useMemo(() => {
+    return [...writingData, ...customWords];
+  }, [writingData, customWords]);
+
+  const filteredWritingData = useMemo(() => {
+    return combinedWritingData.filter((item) => item.level === selectedLevel);
+  }, [combinedWritingData, selectedLevel]);
+
   const [selectedId, setSelectedId] = useState(() => filteredWritingData[0]?.id || "w1");
   const [writerInstance, setWriterInstance] = useState(null);
   const [isWriterLoaded, setIsWriterLoaded] = useState(false);
@@ -36,16 +46,27 @@ export default function SkillWriting({
   const [currentStrokeIndex, setCurrentStrokeIndex] = useState(-1);
   const [inkColor, setInkColor] = useState("#6366f1"); // Default to indigo
 
+  // --- Custom Vocabulary Addition Modal States ---
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newWordSimplified, setNewWordSimplified] = useState("");
+  const [newWordTraditional, setNewWordTraditional] = useState("");
+  const [newWordPinyin, setNewWordPinyin] = useState("");
+  const [newWordMeaning, setNewWordMeaning] = useState("");
+  const [newWordCategory, setNewWordCategory] = useState("Từ tự thêm");
+
   const containerRef = useRef(null);
   const confettiCanvasRef = useRef(null);
   const confettiAnimationRef = useRef(null);
 
-  // Auto-select first item of the new level when selectedLevel changes
+  // Auto-select first item of the new level when selectedLevel changes or active word is deleted
   useEffect(() => {
     if (filteredWritingData.length > 0) {
-      setSelectedId(filteredWritingData[0].id);
+      const exists = filteredWritingData.some(w => w.id === selectedId);
+      if (!exists) {
+        setSelectedId(filteredWritingData[0].id);
+      }
     }
-  }, [selectedLevel]);
+  }, [filteredWritingData, selectedId]);
 
   // Active word based on ID and mode
   const activeCharObj = filteredWritingData.find((w) => w.id === selectedId) || filteredWritingData[0] || writingData[0];
@@ -809,21 +830,75 @@ export default function SkillWriting({
 
         {/* Character list selector */}
         <div className="glass-panel" style={{ padding: "18px" }}>
-          <h4 style={{ fontWeight: 800, fontSize: "0.9rem", color: "hsl(var(--neutral-gray))", marginBottom: "12px", textTransform: "uppercase" }}>
-            Bảng nét chữ Hán (Cấp độ {selectedLevel})
-          </h4>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+            <h4 style={{ fontWeight: 800, fontSize: "0.85rem", color: "hsl(var(--neutral-gray))", textTransform: "uppercase", margin: 0 }}>
+              Nét chữ Hán (Lvl {selectedLevel})
+            </h4>
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="btn btn-ghost"
+              style={{
+                padding: "4px 8px",
+                fontSize: "0.75rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "4px",
+                border: "1px solid hsl(var(--primary-teal))",
+                borderRadius: "8px",
+                background: "rgba(20, 184, 166, 0.05)",
+                color: "hsl(var(--primary-teal-dark))",
+                fontWeight: 700,
+                cursor: "pointer"
+              }}
+            >
+              ➕ Thêm từ
+            </button>
+          </div>
           <div className="char-card-list">
             {filteredWritingData.map((item) => {
               const displayChar = mode === "simplified" ? item.simplified : item.traditional;
               return (
-                <button
-                  key={item.id}
-                  className={`char-select-btn ${item.id === selectedId ? "active" : ""}`}
-                  onClick={() => setSelectedId(item.id)}
-                >
-                  <span className="char-select-hanzi">{displayChar}</span>
-                  <span className="char-select-pinyin">{item.pinyin}</span>
-                </button>
+                <div key={item.id} style={{ position: "relative", display: "inline-block" }}>
+                  <button
+                    className={`char-select-btn ${item.id === selectedId ? "active" : ""}`}
+                    onClick={() => setSelectedId(item.id)}
+                    style={{ paddingRight: item.isCustom ? "34px" : "" }}
+                  >
+                    <span className="char-select-hanzi">{displayChar}</span>
+                    <span className="char-select-pinyin">{item.pinyin}</span>
+                  </button>
+                  {item.isCustom && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm(`Bạn có chắc chắn muốn xóa từ "${displayChar}" khỏi danh sách tự thêm?`)) {
+                          onRemoveCustomWord(item.id);
+                          playSound("wrong");
+                          triggerMascot(`Đã xóa chữ "${displayChar}" thành công! 🗑️`, "happy");
+                        }
+                      }}
+                      style={{
+                        position: "absolute",
+                        right: "8px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        fontSize: "0.9rem",
+                        padding: "4px",
+                        zIndex: 2,
+                        opacity: 0.7,
+                        transition: "opacity 0.2s"
+                      }}
+                      onMouseEnter={(e) => e.target.style.opacity = 1}
+                      onMouseLeave={(e) => e.target.style.opacity = 0.7}
+                      title="Xóa từ vựng này"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
               );
             })}
           </div>
@@ -915,6 +990,248 @@ export default function SkillWriting({
               })()}
               
               {renderGroupedRadicals()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Glassmorphic Modal for Adding Custom Word */}
+      {isAddModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(6px)",
+            zIndex: 1100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+          onClick={() => setIsAddModalOpen(false)}
+        >
+          <div
+            className="glass-panel"
+            style={{
+              background: "rgba(255, 255, 255, 0.95)",
+              maxWidth: "460px",
+              width: "100%",
+              padding: "28px",
+              position: "relative",
+              boxShadow: "0 20px 40px -15px rgba(0, 0, 0, 0.25)",
+              border: "1px solid rgba(255, 255, 255, 0.6)",
+              animation: "popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsAddModalOpen(false)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                border: "none",
+                background: "transparent",
+                fontSize: "1.4rem",
+                cursor: "pointer",
+                color: "hsl(var(--neutral-gray))"
+              }}
+            >
+              &times;
+            </button>
+
+            <h3 style={{ fontWeight: 800, fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "8px", color: "hsl(var(--primary-teal-dark))", marginBottom: "20px" }}>
+              ➕ Thêm từ vựng tùy chỉnh mới
+            </h3>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {/* Simplified Hán tự */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Chữ Giản thể (Simplified) <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  maxLength={1}
+                  placeholder="Nhập 1 chữ Giản thể (ví dụ: 猫)"
+                  value={newWordSimplified}
+                  onChange={(e) => setNewWordSimplified(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none",
+                    transition: "border-color 0.2s"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "hsl(var(--primary-teal))"}
+                  onBlur={(e) => e.target.style.borderColor = "rgba(0,0,0,0.12)"}
+                />
+              </div>
+
+              {/* Traditional Hán tự */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Chữ Phồn thể (Traditional - Để trống nếu giống Giản thể)
+                </label>
+                <input
+                  type="text"
+                  maxLength={1}
+                  placeholder="Nhập chữ Phồn thể nếu khác (ví dụ: 貓)"
+                  value={newWordTraditional}
+                  onChange={(e) => setNewWordTraditional(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none",
+                    transition: "border-color 0.2s"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "hsl(var(--primary-teal))"}
+                  onBlur={(e) => e.target.style.borderColor = "rgba(0,0,0,0.12)"}
+                />
+              </div>
+
+              {/* Pinyin */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Phiên âm Pinyin <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: māo"
+                  value={newWordPinyin}
+                  onChange={(e) => setNewWordPinyin(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none"
+                  }}
+                />
+              </div>
+
+              {/* Meaning */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Ý nghĩa tiếng Việt <span style={{ color: "red" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Con mèo"
+                  value={newWordMeaning}
+                  onChange={(e) => setNewWordMeaning(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none"
+                  }}
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Chủ đề / Nhóm từ
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Động vật (Mặc định: Từ tự thêm)"
+                  value={newWordCategory}
+                  onChange={(e) => setNewWordCategory(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none"
+                  }}
+                />
+              </div>
+
+              {/* Form Actions */}
+              <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="btn btn-ghost"
+                  style={{ flex: 1 }}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const simplifiedTrim = newWordSimplified.trim();
+                    const pinyinTrim = newWordPinyin.trim();
+                    const meaningTrim = newWordMeaning.trim();
+
+                    if (!simplifiedTrim) {
+                      playSound("wrong");
+                      triggerMascot("Bạn ơi, bạn chưa nhập chữ Giản thể kìa! Hãy điền vào nha. 🐃", "sad");
+                      alert("Vui lòng nhập chữ Giản thể!");
+                      return;
+                    }
+                    if (simplifiedTrim.length !== 1) {
+                      playSound("wrong");
+                      triggerMascot("Lỗi rồi! Chữ tùy chỉnh bắt buộc phải là duy nhất 1 ký tự để tập viết trên ô lưới nhé! 🐃", "sad");
+                      alert("Chữ tùy chỉnh bắt buộc phải dài đúng 1 ký tự!");
+                      return;
+                    }
+                    if (!pinyinTrim) {
+                      playSound("wrong");
+                      triggerMascot("Bạn chưa nhập phiên âm Pinyin của chữ rồi kìa! 🐃", "sad");
+                      alert("Vui lòng nhập phiên âm Pinyin!");
+                      return;
+                    }
+                    if (!meaningTrim) {
+                      playSound("wrong");
+                      triggerMascot("Bạn chưa điền nghĩa tiếng Việt của chữ đấy! Điền vào để dễ ghi nhớ nha. 🐃", "sad");
+                      alert("Vui lòng nhập ý nghĩa tiếng Việt!");
+                      return;
+                    }
+
+                    const addedWord = {
+                      id: `custom-${Date.now()}`,
+                      simplified: simplifiedTrim,
+                      traditional: newWordTraditional.trim() || simplifiedTrim,
+                      pinyin: pinyinTrim,
+                      translation: meaningTrim,
+                      level: selectedLevel,
+                      category: newWordCategory.trim() || "Từ tự thêm",
+                      isCustom: true
+                    };
+
+                    onAddCustomWord(addedWord);
+                    playSound("success");
+                    triggerMascot(`Tuyệt vời! Thêm thành công chữ "${addedWord.simplified}" vào danh sách Level ${selectedLevel}! Luyện tập ngay nào! 🎉`, "excited");
+                    setSelectedId(addedWord.id);
+                    setIsAddModalOpen(false);
+
+                    // Reset fields
+                    setNewWordSimplified("");
+                    setNewWordTraditional("");
+                    setNewWordPinyin("");
+                    setNewWordMeaning("");
+                    setNewWordCategory("Từ tự thêm");
+                  }}
+                  className="btn btn-primary"
+                  style={{ flex: 2 }}
+                >
+                  Lưu từ vựng
+                </button>
+              </div>
+
             </div>
           </div>
         </div>

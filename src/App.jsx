@@ -15,6 +15,28 @@ export default function App() {
   const [streak, setStreak] = useState(() => Number(localStorage.getItem("chinese_streak")) || 1);
   const [soundOn, setSoundOn] = useState(() => JSON.parse(localStorage.getItem("chinese_sound")) !== false);
   
+  // Custom Vocabulary State (stored locally)
+  const [customWords, setCustomWords] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("chinese_custom_words")) || [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  // Sync customWords with localStorage
+  useEffect(() => {
+    localStorage.setItem("chinese_custom_words", JSON.stringify(customWords));
+  }, [customWords]);
+
+  const handleAddCustomWord = (newWord) => {
+    setCustomWords((prev) => [newWord, ...prev]);
+  };
+
+  const handleRemoveCustomWord = (wordId) => {
+    setCustomWords((prev) => prev.filter((w) => w.id !== wordId));
+  };
+  
   // Mascot Speech Bubble and Mood Control
   const [mascotText, setMascotText] = useState("Chào mừng bạn! Hôm nay hãy cùng luyện tập Tiếng Trung thật vui nhé! 🐃");
   const [mascotExpression, setMascotExpression] = useState("neutral");
@@ -143,6 +165,9 @@ export default function App() {
             triggerMascot={triggerMascotReaction}
             playSound={playSound}
             streak={streak}
+            customWords={customWords}
+            onAddCustomWord={handleAddCustomWord}
+            onRemoveCustomWord={handleRemoveCustomWord}
           />
         );
       case "reading":

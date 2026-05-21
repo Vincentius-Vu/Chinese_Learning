@@ -305,6 +305,126 @@ export const etymologyData = {
     ],
     story: "Mặt trời (日) là khối phát sáng hình tròn khổng lồ ngoài vũ trụ. Nét ngang ở giữa chính là tia sáng rực rỡ từ tâm lõi thái dương đang sưởi ấm vạn vật mỗi ngày."
   },
+  "中": {
+    radicalSymbol: "丨",
+    radicalName: "Cổn",
+    radicalMeaning: "Nét sổ dọc thẳng đứng",
+    description: "Chữ '中' ban đầu vẽ hình một chiếc cột cờ có các tua rua bay phấp phới cắm ở chính giữa bãi đất trống để triệu tập bộ tộc. Cột cờ thẳng tắp đi qua tâm điểm biểu thị tính trung tâm, ở giữa.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𢎘", desc: "Cột cờ cắm ở giữa, có tua rua bay phấp phới bên cạnh." },
+      { stage: "Kim Văn", character: "𤬩", desc: "Cột cờ thẳng đứng đi xuyên qua tâm điểm một vòng tròn cân đối." },
+      { stage: "Khải Thư", character: "中", desc: "Nét sổ 丨 thẳng đứng đi qua tâm của chữ 口 dẹt vuông vắn." }
+    ],
+    story: "Cắm một chiếc gậy thẳng đứng (丨) xuyên qua hồng tâm của cái bia (口) - đây chính là vị trí 'Ở giữa, Trung tâm' (中)!"
+  },
+  "大": {
+    radicalSymbol: "大",
+    radicalName: "Đại",
+    radicalMeaning: "To lớn, vĩ đại",
+    description: "Chữ tượng hình vẽ dáng một người trưởng thành nhìn trực diện đang dang rộng cả tay và chân hết mức có thể để biểu thị ý nghĩa 'To lớn, vĩ đại'.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡗗", desc: "Nét vẽ trực diện một người đang dang rộng cả hai tay và chân." },
+      { stage: "Tiểu Triện", character: "大", desc: "Uốn nét mềm mại, làm biến mất phần đầu thành điểm giao nhau." },
+      { stage: "Khải Thư", character: "大", desc: "Nét ngang, phẩy trái và mác phải tạo thành tư thế đứng hiên ngang." }
+    ],
+    story: "Một người (人) dang rộng cả hai tay sang hai bên (nét ngang) hết cỡ để nói: 'Nó TO lớn lắm!' chính là chữ 'Đại' (大)."
+  },
+  "小": {
+    radicalSymbol: "小",
+    radicalName: "Tiểu",
+    radicalMeaning: "Nhỏ bé, ít ỏi",
+    description: "Chữ tượng hình vẽ ba hạt cát nhỏ nằm cạnh nhau hoặc ba giọt nước li ti để tượng trưng cho sự nhỏ bé, ít ỏi, mảnh mai.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡭚", desc: "Ba dấu chấm nhỏ nằm hàng ngang biểu trưng ba hạt bụi cát." },
+      { stage: "Tiểu Triện", character: "小", desc: "Biến đổi hạt cát ở giữa thành nét sổ móc đứng, hai bên uốn cong nhẹ." },
+      { stage: "Khải Thư", character: "小", desc: "Nét sổ móc ở giữa và hai nét chấm phẩy đối xứng hai bên." }
+    ],
+    story: "Nét sổ móc ở giữa giống dòng nước chảy yếu ớt, hai bên là hai giọt nước bắn ra li ti rất 'Nhỏ bé' (小)."
+  },
+  "口": {
+    radicalSymbol: "口",
+    radicalName: "Khẩu",
+    radicalMeaning: "Cái miệng, lối vào",
+    description: "Chữ tượng hình nguyên thủy khắc họa cái miệng há ra của con người hoặc lối vào hang động để cất tiếng nói hoặc ăn uống.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𠙵", desc: "Hình vẽ chiếc miệng mở to hơi bo tròn cạnh dưới." },
+      { stage: "Kim Văn", character: "𠙾", desc: "Các nét bo tròn góc cạnh, tạo khoảng trống dẹt biểu thị miệng nói." },
+      { stage: "Khải Thư", character: "口", desc: "Vuông vức hóa hoàn toàn thành hình vuông đơn giản chỉ với ba nét vẽ." }
+    ],
+    story: "Miệng há to nói lời hay ý đẹp (口), hình chữ nhật vuông vức chính là biểu tượng trực quan nhất của cái miệng."
+  },
+  "水": {
+    radicalSymbol: "水",
+    radicalName: "Thủy",
+    radicalMeaning: "Nước, sông ngòi",
+    description: "Chữ tượng hình dòng nước chảy cuồn cuộn ở giữa, xung quanh có các bọt nước hoặc giọt nước li ti bắn ra hai bên bờ sông.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡿺", desc: "Dòng sông uốn khúc mềm mại với bốn chấm nước bắn tung tóe." },
+      { stage: "Tiểu Triện", character: "水", desc: "Nét thẳng hóa dòng sông ở giữa, gợn sóng hai bên đối xứng tròn trịa." },
+      { stage: "Khải Thư", character: "水", desc: "Nét sổ móc ở giữa và các nét ngang phẩy mác hai bên tạo chữ 水 hiện đại." }
+    ],
+    story: "Dòng sông chảy xiết ở giữa (sổ móc), hai bên bờ là bọt nước bắn tung tóe (phẩy mác) sinh động chính là 'Nước' (水)!"
+  },
+  "山": {
+    radicalSymbol: "山",
+    radicalName: "Sơn",
+    radicalMeaning: "Núi non, đỉnh núi",
+    description: "Chữ tượng hình vẽ ba đỉnh núi nhấp nhô nối tiếp nhau trên mặt đất, trong đó ngọn núi ở chính giữa vút cao nhất thể hiện sự hùng vĩ.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡴳", desc: "Ba đỉnh núi hình tam giác nhọn xếp cạnh nhau liên tục." },
+      { stage: "Tiểu Triện", character: "山", desc: "Cách điệu thành ba nét đứng thẳng cắm xuống thanh ngang chân núi." },
+      { stage: "Khải Thư", character: "山", desc: "Nét sổ giữa cao nhất, kết hợp nét gập đáy và nét sổ phải vững chãi." }
+    ],
+    story: "Ba đỉnh núi trùng trùng điệp điệp, ngọn núi ở giữa vút cao nhất chính là chữ 'Sơn' (山) - Núi non!"
+  },
+  "月": {
+    radicalSymbol: "月",
+    radicalName: "Nguyệt",
+    radicalMeaning: "Mặt trăng, tháng, thể xác",
+    description: "Chữ tượng hình vẽ vầng trăng khuyết tinh tế để phân biệt với mặt trời (日) tròn trịa. Nét ngang ở trong lòng trăng biểu thị ánh trăng thanh mát.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "🌙", desc: "Hình vầng trăng khuyết mỏng đầu nhọn hướng sang phải." },
+      { stage: "Tiểu Triện", character: "月", desc: "Uốn cong dài mềm mại hơn, lòng trăng được khép nhẹ có nét ngang." },
+      { stage: "Khải Thư", character: "月", desc: "Cấu trúc sổ móc vuông vắn có hai nét ngang bên trong biểu trưng mây mờ." }
+    ],
+    story: "Mặt trăng khuyết (月) dịu dàng soi sáng ban đêm, hai nét ngang bên trong là vệt mây mờ trôi qua cung trăng."
+  },
+  "女": {
+    radicalSymbol: "女",
+    radicalName: "Nữ",
+    radicalMeaning: "Người phụ nữ, con gái",
+    description: "Chữ tượng hình phác họa người phụ nữ thời cổ đang quỳ gối làm việc nhà chu đáo, hai tay đan chéo cung kính trước ngực thể hiện dáng vẻ hiền dịu.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡢖", desc: "Hình vẽ nghiêng người phụ nữ quỳ gối, hai tay đan chéo tôn kính." },
+      { stage: "Tiểu Triện", character: "女", desc: "Nét chữ uốn lượn đan xen cực kỳ mềm mại, tôn dáng nữ tính." },
+      { stage: "Khải Thư", character: "女", desc: "Nét phẩy chấm đan mác ngang tạo chữ 女 vuông vắn, thanh tao." }
+    ],
+    story: "Người phụ nữ (女) đang quỳ gối cung kính, nét ngang chính là đôi tay đang thu xếp mọi việc chu toàn và ấm êm."
+  },
+  "子": {
+    radicalSymbol: "子",
+    radicalName: "Tử",
+    radicalMeaning: "Đứa trẻ, con cái",
+    description: "Chữ tượng hình đứa bé sơ sinh nằm trong nôi quấn tã, có đầu tròn to, hai tay dang rộng vẫy nghịch đùa vui và hai chân chụm lại ấm áp.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡿹", desc: "Em bé đầu tròn xoe, hai tay dang rộng ngo ngoe đùa nghịch." },
+      { stage: "Tiểu Triện", character: "子", desc: "Phần chân quấn tã dẹt dài thành nét sổ cong móc uyển chuyển." },
+      { stage: "Khải Thư", character: "子", desc: "Gồm nét ngang phẩy, sổ cong móc và nét ngang giang tay rộng mở." }
+    ],
+    story: "Đứa trẻ (子) đầu tròn xoe, hai tay dang ngang (nét ngang) đòi mẹ bế bồng, hai chân khép lại quấn trong tã ấm áp."
+  },
+  "天": {
+    radicalSymbol: "大",
+    radicalName: "Đại",
+    radicalMeaning: "To lớn, vĩ đại",
+    description: "Chữ hội ý tượng hình. Được phát triển từ chữ Đại (大 - người trưởng thành), vẽ thêm một nét ngang lớn ở trên đỉnh đầu để biểu thị khoảng không vô tận phía trên đầu con người - bầu trời.",
+    evolution: [
+      { stage: "Giáp Cốt", character: "𡗠", desc: "Chữ Đại (大) có chiếc đầu hình vuông hoặc tròn khổng lồ." },
+      { stage: "Kim Văn", character: "𡗤", desc: "Đầu biến đổi thành nét ngang dài độc lập song song phía trên vai chữ Đại." },
+      { stage: "Khải Thư", character: "天", desc: "Hai nét ngang và phẩy mác tạo tư thế đứng dưới vòm trời rộng mở." }
+    ],
+    story: "Con người (大) đứng dang rộng chân tay trên mặt đất, nét ngang trên cùng đại diện cho bầu trời cao rộng (天) bao la."
+  },
 
   // --- LEVEL 2 (HSK 2) ---
   "爱": {
