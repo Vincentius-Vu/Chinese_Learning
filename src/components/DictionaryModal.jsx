@@ -533,11 +533,15 @@ export default function DictionaryModal({
                     </div>
                   )}
 
-                  {/* Fallback info for custom characters */}
-                  {selectedChar.source === "custom" && !activeCharEtymology && (
+                  {/* Fallback info for characters without etymology */}
+                  {!activeCharEtymology && (
                     <div style={{ textAlign: "center", padding: "20px", color: "hsl(var(--neutral-gray))", background: "white", borderRadius: "10px", border: "1px dashed rgba(0,0,0,0.1)" }}>
-                      <p style={{ margin: 0, fontSize: "0.85rem", fontWeight: 700 }}>Chữ Hán tự tùy chỉnh của bạn</p>
-                      <p style={{ margin: "4px 0 0", fontSize: "0.75rem" }}>Không có dữ liệu chi tiết nguồn gốc của chữ này. Bạn vẫn có thể luyện tập nét vẽ và ghi nhớ nghĩa bên dưới.</p>
+                      <p style={{ margin: 0, fontSize: "0.85rem", fontWeight: 700 }}>
+                        {selectedChar.source === "custom" ? "Chữ Hán tự tùy chỉnh" : "Từ vựng học tập"}
+                      </p>
+                      <p style={{ margin: "4px 0 0", fontSize: "0.75rem" }}>
+                        Không có dữ liệu chi tiết nguồn gốc của chữ này. Bạn vẫn có thể xem bộ thủ, nghe phát âm và tập viết nét chuẩn bình thường.
+                      </p>
                     </div>
                   )}
 
