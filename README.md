@@ -5,7 +5,7 @@
 [![Gh-Pages](https://img.shields.io/badge/Deploy-GitHub_Pages-222222?style=flat-square&logo=github&logoColor=white)](https://pages.github.com)
 [![License](https://img.shields.io/badge/License-MIT-4CABA0?style=flat-square)](LICENSE)
 
-Chào mừng bạn đến với **Chinese Learning Web Application** – Một ứng dụng web học tiếng Trung hiện đại, trực quan và toàn diện. Ứng dụng tập trung tối ưu hóa trải nghiệm tự học thông qua việc huấn luyện chuyên sâu **4 kỹ năng ngôn ngữ cốt lõi (Nghe - Nói - Đọc - Viết)** trải dài từ cấp độ **HSK/TOCFL 1 đến 6**, tích hợp hệ thống **Từ điển tra cứu Hán-Việt thông minh** cùng công cụ quản lý từ vựng cá nhân cá nhân hóa.
+Chào mừng bạn đến với **Chinese Learning Web Application** – Một ứng dụng web học tiếng Trung hiện đại, trực quan và toàn diện. Ứng dụng tập trung tối ưu hóa trải nghiệm tự học thông qua việc huấn luyện chuyên sâu **4 kỹ năng ngôn ngữ cốt lõi (Nghe - Nói - Đọc - Viết)** trải dài từ cấp độ **HSK/TOCFL 1 đến 6**, tích hợp hệ thống **Từ điển tra cứu Hán-Việt thông minh**, **Giao diện đa ngôn ngữ** và thanh điều hướng di động tối ưu.
 
 👉 **Môi trường trực tuyến**: Ứng dụng đã được xuất bản tự động và chạy ổn định trên GitHub Pages.
 
@@ -16,42 +16,44 @@ Chào mừng bạn đến với **Chinese Learning Web Application** – Một �
 ### 1. Cơ sở Dữ liệu Từ vựng Khổng lồ & Chuẩn hóa
 * **1.800 từ vựng cốt lõi**: Phân bổ đồng đều 300 từ cho mỗi cấp độ HSK/TOCFL 1-6.
 * **Đầy đủ thông tin chi tiết**: Mỗi từ vựng bao gồm Chữ giản thể (Simplified), Chữ phồn thể (Traditional), Phiên âm Pinyin, **Phiên âm Hán-Việt** (ví dụ: `学习` -> `Học Tập`), Nghĩa tiếng Việt tự nhiên và Phân nhóm chủ đề học tập.
-* **Đồng bộ hóa dữ liệu**: Hỗ trợ tự động hóa chuyển đổi dữ liệu không xảy ra lỗi trùng lặp hay xung đột ID.
 
-### 2. Huấn luyện 4 Kỹ năng Ngôn ngữ Chuyên sâu
+### 2. Giao diện Đa ngôn ngữ UI (Multi-language Support)
+* **Hỗ trợ 3 ngôn ngữ**: Tiếng Việt (`vi`), Chữ Hán Giản thể (`zh-CN`), và Chữ Hán Phồn thể (`zh-TW`).
+* **Đồng bộ hóa tức thì**: Người dùng có thể chuyển đổi ngôn ngữ qua bộ chọn kính mờ (glassmorphic select) trên Header. Lựa chọn được lưu tự động vào `LocalStorage` để duy trì phiên bản hiển thị ưa thích.
+* **Bản địa hóa toàn diện**: Dịch toàn bộ thanh điều hướng, nhãn kỹ năng, thống kê thành tích, nút hành động và bong bóng hội thoại tương tác của linh vật Mascot.
+
+### 3. Huấn luyện 4 Kỹ năng Ngôn ngữ Chuyên sâu
 * **✍️ Kỹ năng Viết (Writing)**:
-  - Tích hợp bảng vẽ Canvas tương tác cho phép người dùng dùng chuột hoặc màn hình cảm ứng để tập viết chữ Hán trực tiếp.
-  - Hỗ trợ hoạt ảnh vẽ mẫu theo từng nét bút (stroke-by-stroke animations) chuẩn xác.
-  - Tự động kiểm tra độ chính xác của nét vẽ và cung cấp điểm số đánh giá trực quan.
+  - Tích hợp bảng vẽ Canvas tương tác dùng chuột hoặc màn hình cảm ứng di động.
+  - Hỗ trợ hoạt ảnh vẽ mẫu theo từng nét bút (stroke-by-stroke) chuẩn xác.
+  - **Khóa cuộn trang di động (Touch Lock)**: Sử dụng thuộc tính `touch-action: none` để ngăn chặn màn hình bị giật nảy hoặc cuộn trang khi vẽ chữ bằng ngón tay.
 * **📚 Kỹ năng Đọc hiểu (Reading)**:
-  - Kho **42 bài học đọc hiểu chất lượng cao** (đúng 7 bài mỗi cấp độ).
-  - Mỗi bài học đi kèm văn bản giản thể, phồn thể, Pinyin, bản dịch tiếng Việt mượt mà cùng danh sách từ vựng trọng tâm.
-  - Hệ thống câu hỏi trắc nghiệm khách quan đa dạng với **lời giải thích chi tiết bằng tiếng Việt** giúp người học hiểu sâu ngữ pháp và ngữ cảnh.
+  - Kho **42 bài học đọc hiểu chất lượng cao** (7 bài mỗi cấp độ).
+  - Tích hợp văn bản giản/phồn thể, phiên âm Pinyin (có thể bật/tắt), bản dịch mượt mà và từ vựng trọng tâm.
+  - Câu hỏi trắc nghiệm có **giải thích chi tiết bằng tiếng Việt** giúp hiểu sâu ngữ cảnh.
 * **🎧 Kỹ năng Nghe (Listening)**:
-  - Các bài nghe hiểu phong phú tích hợp giọng đọc bản xứ chuẩn thông qua **Speech Synthesis API** của trình duyệt.
-  - Câu hỏi trắc nghiệm kiểm tra độ hiểu thông tin kèm kịch bản nghe (script) trực quan.
+  - Tích hợp giọng đọc bản xứ chuẩn giọng Bắc Kinh thông qua **Speech Synthesis API** (hỗ trợ điều chỉnh tốc độ chuẩn `🔊` và tốc độ chậm của rùa `🐢`).
+  - Hệ thống trắc nghiệm lựa chọn nghĩa kèm kịch bản nghe trực quan.
+  - **Giải thích Hán-Việt chuyên sâu**: Cung cấp giải thích chi tiết bằng tiếng Việt ngay khi kiểm tra đáp án *chỉ dành riêng cho Cấp độ 1, 2 và 3*. Ẩn giải thích ở Level 4+ để duy trì thử thách tự nhiên cho người học trung-cao cấp.
 * **🗣️ Kỹ năng Nói (Speaking)**:
-  - Sử dụng **Speech Recognition API** để nhận diện giọng nói và chấm điểm phát âm tiếng Trung của người học trong thời gian thực.
-  - Cung cấp phản hồi lập tức để cải thiện khẩu hình và thanh điệu Pinyin.
+  - Sử dụng **Speech Recognition API** nhận diện giọng nói và chấm điểm phát âm tiếng Trung theo thời gian thực (hiển thị thang điểm phần trăm chính xác).
 
-### 3. Hệ thống Từ điển Tra cứu Hán-Việt Đa năng (`DictionaryModal`)
-* **Kích hoạt nhanh**: Nút kính mờ màu Teal (`🔍`) nổi bật trên Header cho phép tra cứu ngay lập tức từ bất kỳ màn hình nào.
-* **Tìm kiếm đa dạng**: Tìm kiếm song song tức thì theo Chữ giản/phồn, Pinyin (có dấu hoặc không dấu), âm Hán-Việt hoặc nghĩa tiếng Việt. Tự động chuẩn hóa chuỗi để bỏ qua dấu tiếng Việt và thanh điệu Pinyin khi nhập liệu.
+### 4. Hệ thống Từ điển Tra cứu Hán-Việt Đa năng (`DictionaryModal`)
+* **Kích hoạt nhanh**: Nút kính mờ màu Teal (`🔍`) nổi bật trên Header cho phép tra cứu từ bất kỳ màn hình nào.
+* **Tìm kiếm song song**: Tìm kiếm đồng thời theo Chữ giản/phồn, Pinyin (có/không dấu), âm Hán-Việt hoặc nghĩa tiếng Việt (tự động chuẩn hóa chuỗi loại bỏ dấu).
 * **Thông tin chi tiết chuyên sâu**:
-  - Phóng to chữ Hán, tích hợp nút phát âm giọng bản xứ `🔊`.
-  - Hiển thị bộ thủ, mẹo ghi nhớ chữ Hán thông qua hình ảnh hoặc câu chuyện.
-  - **Sơ đồ tiến hóa chữ viết cổ đại**: Mô phỏng sự tiến hóa của chữ Hán qua 4 thời kỳ lịch sử tiêu biểu: *Giáp Cốt Văn (Oracle Bone), Kim Văn (Bronze), Tiểu Triện (Seal), Khải Thư (Regular Script)* với thiết kế hiệu ứng giả lập chất liệu lịch sử (khắc xương, đúc đồng, đóng dấu, nét cọ).
-  - **Tập viết ngay (`✍️`)**: Liên kết trực tiếp, khi bấm nút sẽ tự động nạp chữ Hán được chọn vào Canvas tập viết chữ.
+  - Tích hợp phát âm giọng bản xứ `🔊`, bộ thủ, mẹo ghi nhớ chữ Hán.
+  - **Sơ đồ tiến hóa chữ viết cổ đại**: Mô phỏng sự tiến hóa của chữ Hán qua 4 thời kỳ lịch sử tiêu biểu: *Giáp Cốt Văn (Oracle Bone), Kim Văn (Bronze), Tiểu Triện (Seal), Khải Thư (Regular Script)* với thiết kế giả lập chất liệu lịch sử (xương khắc, đồng đúc, dấu ấn, nét cọ).
+  - **Liên kết tập viết nhanh (`✍️`)**: Tự động chuyển kỹ năng viết và nạp chữ Hán được chọn vào Canvas tập viết ngay lập tức.
 
-### 4. Quản lý Từ vựng Cá nhân (Custom Words)
+### 5. Quản lý Từ vựng Cá nhân (Custom Words)
 * Cho phép người học tự thêm, chỉnh sửa hoặc xóa các từ vựng mới của riêng mình.
-* Tự động tra cứu fallback phiên âm Hán-Việt từ file bản đồ âm `sinoVietMap.js` trong trường hợp người dùng bỏ trống trường Hán-Việt khi thêm từ.
+* Tự động tra cứu fallback phiên âm Hán-Việt từ file bản đồ âm `sinoVietMap.js` khi thêm từ.
 
-### 5. Giao diện Thẩm mỹ & Trải nghiệm Người dùng
-* Phong cách thiết kế hiện đại pha lẫn nét cổ điển Á Đông, sử dụng các gam màu Teal và HSL hài hòa.
-* Hiệu ứng kính mờ (Glassmorphism), viền phát sáng nhẹ, đổ bóng và các vi chuyển động (micro-animations) mượt mà khi hover.
-* Tối ưu hóa hiển thị responsive hoàn hảo trên mọi kích thước màn hình di động, máy tính bảng và máy tính để bàn.
-* **Trợ lý Mascot tương tác**: Chú gấu trúc dễ thương xuất hiện sinh động, đưa ra lời khuyên học tập, phản hồi kết quả trắc nghiệm và khích lệ tinh thần người học.
+### 6. Thẩm mỹ Glassmorphism & Tối ưu Di động
+* Thiết kế kính mờ (Glassmorphism), viền phát sáng nhẹ, đổ bóng và các vi chuyển động (micro-animations) mượt mà.
+* **Thanh điều hướng dưới cùng di động (Mobile Bottom Nav)**: Đối với các màn hình nhỏ `<768px`, thanh Sidebar bên trái sẽ tự động ẩn đi và thanh điều hướng dưới chân trang sẽ hiển thị theo chuẩn ứng dụng di động native, mang lại trải nghiệm tiện lợi tối đa.
+* **Trợ lý Mascot tương tác**: Chú gấu trúc/trâu nước xuất hiện sinh động, đưa ra lời khuyên học tập, phản hồi kết quả trắc nghiệm và khích lệ tinh thần người học.
 
 ---
 
@@ -67,17 +69,18 @@ Chinese_Learning/
 │   │   ├── DictionaryModal.jsx   # Modal từ điển Hán-Việt đa năng & tiến hóa chữ cổ
 │   │   ├── Header.jsx            # Thanh điều hướng đầu trang và nút tra cứu
 │   │   ├── Mascot.jsx            # Trợ lý Mascot tương tác dễ thương
-│   │   ├── SkillListening.jsx    # Giao diện luyện kỹ năng Nghe hiểu
+│   │   ├── SkillListening.jsx    # Giao diện luyện kỹ năng Nghe hiểu (giải thích HSK 1-3)
 │   │   ├── SkillReading.jsx      # Giao diện luyện kỹ năng Đọc hiểu & làm bài trắc nghiệm
 │   │   ├── SkillSpeaking.jsx     # Giao diện luyện Nói & Nhận diện phát âm (Speech Recog)
 │   │   └── SkillWriting.jsx      # Bảng vẽ vẽ Canvas & ảnh động hướng dẫn tập viết chữ Hán
 │   ├── data/               # Cơ sở dữ liệu và ánh xạ dữ liệu tĩnh
 │   │   ├── etymologyData.js      # Dữ liệu nguồn gốc và tiến hóa chữ cổ (Oracle, Bronze, Seal)
 │   │   ├── sinoVietMap.js        # Bản đồ âm tự động ánh xạ chữ Hán -> Phiên âm Hán-Việt
-│   │   └── vocabulary.js         # Toàn bộ database từ vựng (1.800 từ) và 4 kỹ năng
+│   │   ├── translations.js       # Từ điển dịch thuật giao diện đa ngôn ngữ (vi, zh-CN, zh-TW)
+│   │   └── vocabulary.js         # Toàn bộ database từ vựng (1.800 từ) và bài tập 4 kỹ năng
 │   ├── App.css             # CSS chính điều khiển bố cục ứng dụng
-│   ├── App.jsx             # File điều hướng logic cốt lõi của ứng dụng
-│   ├── index.css           # Hệ thống CSS Token, biến toàn cục, hiệu ứng và responsive
+│   ├── App.jsx             # File điều hướng logic cốt lõi của ứng dụng (uiLang, t())
+│   ├── index.css           # Hệ thống CSS Token, biến toàn cục, hiệu ứng và responsive / Bottom Nav
 │   ├── main.jsx            # Điểm khởi chạy React của ứng dụng
 │   └── lib/                # Các thư viện bổ trợ tiện ích
 ├── eslint.config.js        # Cấu hình kiểm lỗi mã nguồn ESLint
@@ -91,13 +94,13 @@ Chinese_Learning/
 
 ## 🛠️ Công nghệ Sử dụng
 
-1. **React 19 & Vite 8**: Nền tảng cốt lõi giúp xây dựng giao diện component hóa, tải trang cực nhanh với cơ chế Hot Module Replacement (HMR).
-2. **Vanilla CSS**: Được tùy biến sâu sắc để tạo dựng hệ thống biến giao diện (`css-variables`), hỗ trợ Dark/Light Theme linh hoạt, hiệu ứng chuyển cảnh mượt mà và giao diện thích ứng responsive không cần phụ thuộc vào framework bên ngoài.
+1. **React 19 & Vite 8**: Nền tảng giao diện component hóa, tải trang cực nhanh với cơ chế Hot Module Replacement (HMR).
+2. **Vanilla CSS**: Tùy biến sâu sắc để tạo dựng hệ thống biến giao diện (`css-variables`), hỗ trợ hiệu ứng chuyển cảnh mượt mà và giao diện thích ứng responsive không cần phụ thuộc vào framework bên ngoài.
 3. **Web APIs tích hợp**:
    - **SpeechSynthesis**: Phát âm thanh tiếng Trung tự nhiên chuẩn giọng bản địa.
    - **SpeechRecognition**: Thu âm và nhận dạng giọng nói chấm điểm trực tiếp.
    - **HTML5 Canvas**: Vẽ và kiểm tra tọa độ nét chữ phục vụ kỹ năng viết.
-4. **Local Storage**: Đồng bộ lưu trữ tiến trình làm bài trắc nghiệm, lịch sử học tập và danh sách từ vựng tùy chỉnh cá nhân.
+4. **Local Storage**: Đồng bộ lưu trữ tiến trình làm bài trắc nghiệm, ngôn ngữ hiển thị UI, lịch sử học tập và từ vựng tùy chỉnh.
 
 ---
 
@@ -137,6 +140,14 @@ Lệnh này sẽ tự động chạy biên dịch dự án (`predeploy`) và đ�
 ---
 
 ## 📄 Bản quyền & Đóng góp
-Dự án được phân phối dưới giấy phép mã nguồn mở MIT. Mọi đóng góp, báo lỗi hoặc đề xuất cải tiến tính năng đều được hoan nghênh nhiệt liệt thông qua phần **Issues** hoặc **Pull Requests** trên GitHub.
 
-*Chúc các bạn có những giờ học tiếng Trung thật bổ ích và thú vị cùng **Chinese Learning Web Application**! 🐼🎒*
+Dự án này được phân phối dưới giấy phép **MIT License** – một giấy phép mã nguồn mở cực kỳ phổ biến, cho phép tự do sử dụng, chỉnh sửa và phân phối lại.
+
+> **Lưu ý về Tác quyền**:
+> Giấy phép MIT rất thông thoáng nhưng yêu cầu bắt buộc bất kỳ bản sao hoặc sản phẩm phái sinh nào sử dụng mã nguồn này cũng phải đính kèm thông báo bản quyền (Copyright Notice) gốc và tuyên bố miễn trừ trách nhiệm của tác giả.
+>
+> Nếu bạn muốn đảm bảo mọi cải tiến hoặc phiên bản sửa đổi từ dự án này bắt buộc cũng phải được mở mã nguồn (Copyleft), bạn có thể cân nhắc chuyển đổi sang giấy phép **GNU GPL v3**.
+
+Mọi đóng góp, báo lỗi hoặc đề xuất cải tiến tính năng đều được hoan nghênh nhiệt liệt thông qua phần **Issues** hoặc **Pull Requests** trên GitHub.
+
+*Chúc các bạn có những giờ học tiếng Trung thật bổ ích và thú vị cùng **Chinese Learning Web Application**! 🐃🎒*
