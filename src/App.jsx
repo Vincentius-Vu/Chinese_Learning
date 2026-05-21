@@ -439,7 +439,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="footer-credits">
-        Ứng dụng học tiếng Trung 4 kỹ năng · Thực hiện bởi <a href="https://github.com/tranhieutt" target="_blank" rel="noopener noreferrer">Antigravity</a>
+        Ứng dụng học tiếng Trung 4 kỹ năng · Thực hiện bởi <a href="https://github.com/Vincentius-Vu/Chinese_Learning" target="_blank" rel="noopener noreferrer">Tri-Vien Vu + Antigravity</a>
       </footer>
     </div>
   );
