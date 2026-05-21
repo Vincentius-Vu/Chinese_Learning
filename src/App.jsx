@@ -5,6 +5,7 @@ import SkillWriting from "./components/SkillWriting";
 import SkillReading from "./components/SkillReading";
 import SkillListening from "./components/SkillListening";
 import SkillSpeaking from "./components/SkillSpeaking";
+import DictionaryModal from "./components/DictionaryModal";
 
 export default function App() {
   // Global States (loaded from localStorage with safe default fallbacks)
@@ -43,6 +44,10 @@ export default function App() {
 
   // Help Modal state
   const [helpOpen, setHelpOpen] = useState(false);
+
+  // Dictionary Lookup Modal and Jump States
+  const [isDictOpen, setIsDictOpen] = useState(false);
+  const [jumpedWordId, setJumpedWordId] = useState(null);
 
   // Sync state changes with localStorage
   useEffect(() => {
@@ -149,8 +154,24 @@ export default function App() {
   };
 
   // Helper to add XP points dynamically
+  const [tempSoundState, setTempSoundState] = useState(soundOn); // Track sound changes
   const addXpPoints = (points) => {
     setXp((prev) => prev + points);
+  };
+
+  // Jump from Dictionary to SkillWriting Practice Canvas
+  const handleJumpToWriting = (charObj) => {
+    setActiveSkill("writing");
+    setSelectedLevel(charObj.level);
+    setJumpedWordId(charObj.id);
+    
+    // Auto-clear jumpedWordId to ensure subsequent clicks trigger the state dependency change correctly
+    setTimeout(() => {
+      setJumpedWordId(null);
+    }, 100);
+
+    playSound("correct");
+    triggerMascotReaction(`Bạn đã chọn chữ "${charObj.simplified || charObj.traditional}". Hãy cùng tập viết nét chuẩn nhé! 🐃`, "excited");
   };
 
   // Renders active skill panel
@@ -168,6 +189,7 @@ export default function App() {
             customWords={customWords}
             onAddCustomWord={handleAddCustomWord}
             onRemoveCustomWord={handleRemoveCustomWord}
+            autoSelectWordId={jumpedWordId}
           />
         );
       case "reading":
@@ -219,6 +241,7 @@ export default function App() {
         selectedLevel={selectedLevel}
         setSelectedLevel={setSelectedLevel}
         onOpenHelp={() => setHelpOpen(true)}
+        onOpenDict={() => setIsDictOpen(true)}
       />
 
       <main className="app-container flex-spacer" style={{ width: "100%" }}>
@@ -359,6 +382,15 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Tra cứu Hán-Việt Dictionary Modal */}
+      <DictionaryModal
+        isOpen={isDictOpen}
+        onClose={() => setIsDictOpen(false)}
+        customWords={customWords}
+        onJumpToWriting={handleJumpToWriting}
+        mode={mode}
+      />
 
       {/* Footer */}
       <footer className="footer-credits">

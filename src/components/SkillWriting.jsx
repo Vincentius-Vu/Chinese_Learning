@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { writingData } from "../data/vocabulary";
 import { etymologyData, radicalsList } from "../data/etymologyData";
+import { sinoVietMap } from "../data/sinoVietMap";
 
 export default function SkillWriting({
   mode,
@@ -11,7 +12,8 @@ export default function SkillWriting({
   streak,
   customWords = [],
   onAddCustomWord,
-  onRemoveCustomWord
+  onRemoveCustomWord,
+  autoSelectWordId
 }) {
   const combinedWritingData = useMemo(() => {
     return [...writingData, ...customWords];
@@ -51,6 +53,7 @@ export default function SkillWriting({
   const [newWordSimplified, setNewWordSimplified] = useState("");
   const [newWordTraditional, setNewWordTraditional] = useState("");
   const [newWordPinyin, setNewWordPinyin] = useState("");
+  const [newWordSinoViet, setNewWordSinoViet] = useState("");
   const [newWordMeaning, setNewWordMeaning] = useState("");
   const [newWordCategory, setNewWordCategory] = useState("Từ tự thêm");
 
@@ -58,15 +61,19 @@ export default function SkillWriting({
   const confettiCanvasRef = useRef(null);
   const confettiAnimationRef = useRef(null);
 
-  // Auto-select first item of the new level when selectedLevel changes or active word is deleted
+  // Auto-select first item of the new level when selectedLevel changes, jumped from dictionary, or active word is deleted
   useEffect(() => {
     if (filteredWritingData.length > 0) {
-      const exists = filteredWritingData.some(w => w.id === selectedId);
-      if (!exists) {
-        setSelectedId(filteredWritingData[0].id);
+      if (autoSelectWordId && filteredWritingData.some(w => w.id === autoSelectWordId)) {
+        setSelectedId(autoSelectWordId);
+      } else {
+        const exists = filteredWritingData.some(w => w.id === selectedId);
+        if (!exists) {
+          setSelectedId(filteredWritingData[0].id);
+        }
       }
     }
-  }, [filteredWritingData, selectedId]);
+  }, [filteredWritingData, selectedId, autoSelectWordId]);
 
   // Active word based on ID and mode
   const activeCharObj = filteredWritingData.find((w) => w.id === selectedId) || filteredWritingData[0] || writingData[0];
@@ -711,6 +718,20 @@ export default function SkillWriting({
                 </span>
               </div>
 
+              {/* Phiên âm Hán-Việt */}
+              {(() => {
+                const sinoVietReading = activeCharObj.sinoViet || sinoVietMap[activeChar] || "";
+                if (!sinoVietReading) return null;
+                return (
+                  <div className="char-info-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(0,0,0,0.04)", paddingBottom: "6px" }}>
+                    <span className="char-info-label" style={{ fontWeight: 700, color: "hsl(var(--neutral-gray))", fontSize: "0.85rem" }}>Âm Hán-Việt:</span>
+                    <span className="char-info-val" style={{ color: "hsl(var(--primary-teal-dark))", fontWeight: 800 }}>
+                      {sinoVietReading}
+                    </span>
+                  </div>
+                );
+              })()}
+
               <div className="char-info-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(0,0,0,0.04)", paddingBottom: "6px" }}>
                 <span className="char-info-label" style={{ fontWeight: 700, color: "hsl(var(--neutral-gray))", fontSize: "0.85rem" }}>Ý nghĩa:</span>
                 <span className="char-info-val" style={{ fontSize: "0.9rem", fontWeight: 700, textAlign: "right" }}>
@@ -1117,6 +1138,30 @@ export default function SkillWriting({
                 />
               </div>
 
+              {/* Phiên âm Hán-Việt */}
+              <div>
+                <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
+                  Phiên âm Hán-Việt (Để trống sẽ tự tra cứu nếu có)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Ngã (cho chữ 我)"
+                  value={newWordSinoViet}
+                  onChange={(e) => setNewWordSinoViet(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(0,0,0,0.12)",
+                    fontSize: "0.95rem",
+                    outline: "none",
+                    transition: "border-color 0.2s"
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = "hsl(var(--primary-teal))"}
+                  onBlur={(e) => e.target.style.borderColor = "rgba(0,0,0,0.12)"}
+                />
+              </div>
+
               {/* Meaning */}
               <div>
                 <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, color: "hsl(var(--neutral-dark))", marginBottom: "6px" }}>
@@ -1206,6 +1251,7 @@ export default function SkillWriting({
                       simplified: simplifiedTrim,
                       traditional: newWordTraditional.trim() || simplifiedTrim,
                       pinyin: pinyinTrim,
+                      sinoViet: newWordSinoViet.trim(),
                       translation: meaningTrim,
                       level: selectedLevel,
                       category: newWordCategory.trim() || "Từ tự thêm",
@@ -1222,6 +1268,7 @@ export default function SkillWriting({
                     setNewWordSimplified("");
                     setNewWordTraditional("");
                     setNewWordPinyin("");
+                    setNewWordSinoViet("");
                     setNewWordMeaning("");
                     setNewWordCategory("Từ tự thêm");
                   }}

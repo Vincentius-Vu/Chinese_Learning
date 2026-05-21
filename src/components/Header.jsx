@@ -10,7 +10,8 @@ export default function Header({
   setSoundOn,
   selectedLevel,
   setSelectedLevel,
-  onOpenHelp
+  onOpenHelp,
+  onOpenDict
 }) {
   // Calculate level progress (e.g. 100 XP per level)
   const progressPercent = xp % 100;
@@ -114,6 +115,16 @@ export default function Header({
               title={soundOn ? "Tắt âm thanh" : "Bật âm thanh"}
             >
               {soundOn ? "🔊" : "🔇"}
+            </button>
+
+            {/* Dictionary Button */}
+            <button
+              className="util-btn"
+              onClick={onOpenDict}
+              title="Tra từ điển Hán-Việt"
+              style={{ background: "rgba(20, 184, 166, 0.15)", borderColor: "rgba(20, 184, 166, 0.3)" }}
+            >
+              🔍
             </button>
 
             {/* Help Button */}

@@ -1794,3 +1794,26 @@ input, button, select {
   box-shadow: 0 4px 10px rgba(99, 102, 241, 0.15) !important;
 }
 
+/* --- Responsive styles for Dictionary Tra cứu Modal --- */
+@media (max-width: 800px) {
+  .dict-flex-container {
+    flex-direction: column !important;
+  }
+  .dict-col-left, .dict-col-right {
+    width: 100% !important;
+    border-right: none !important;
+    height: auto !important;
+  }
+  .dict-modal-content {
+    height: 92vh !important;
+  }
+  .dict-col-right {
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .dict-detail-top {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
