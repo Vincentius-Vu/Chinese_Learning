@@ -3,7 +3,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vite.dev)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![Gh-Pages](https://img.shields.io/badge/Deploy-GitHub_Pages-222222?style=flat-square&logo=github&logoColor=white)](https://pages.github.com)
-[![License](https://img.shields.io/badge/License-MIT-4CABA0?style=flat-square)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=flat-square)](LICENSE)
 
 Chào mừng bạn đến với **Chinese Learning Web Application** – Một ứng dụng web học tiếng Trung hiện đại, trực quan và toàn diện. Ứng dụng tập trung tối ưu hóa trải nghiệm tự học thông qua việc huấn luyện chuyên sâu **4 kỹ năng ngôn ngữ cốt lõi (Nghe - Nói - Đọc - Viết)** trải dài từ cấp độ **HSK/TOCFL 1 đến 6**, tích hợp hệ thống **Từ điển tra cứu Hán-Việt thông minh**, **Giao diện đa ngôn ngữ** và thanh điều hướng di động tối ưu.
 
@@ -36,11 +36,11 @@ Chào mừng bạn đến với **Chinese Learning Web Application** – Một �
   - Hệ thống trắc nghiệm lựa chọn nghĩa kèm kịch bản nghe trực quan.
   - **Giải thích Hán-Việt chuyên sâu**: Cung cấp giải thích chi tiết bằng tiếng Việt ngay khi kiểm tra đáp án *chỉ dành riêng cho Cấp độ 1, 2 và 3*. Ẩn giải thích ở Level 4+ để duy trì thử thách tự nhiên cho người học trung-cao cấp.
 * **🗣️ Kỹ năng Nói (Speaking)**:
-  - Sử dụng **Speech Recognition API** nhận diện giọng nói và chấm điểm phát âm tiếng Trung theo thời gian thực (hiển thị thang điểm phần trăm chính xác).
+  - Sử dụng **Speech Recognition API** nhận diện giọng nói và chấm điểm phát âm tiếng Trung theo thời gian thực (hiển thị thang điểm phần trạng chính xác).
 
 ### 4. Hệ thống Từ điển Tra cứu Hán-Việt Đa năng (`DictionaryModal`)
 * **Kích hoạt nhanh**: Nút kính mờ màu Teal (`🔍`) nổi bật trên Header cho phép tra cứu từ bất kỳ màn hình nào.
-* **Tìm kiếm song song**: Tìm kiếm đồng thời theo Chữ giản/phồn, Pinyin (có/không dấu), âm Hán-Việt hoặc nghĩa tiếng Việt (tự động chuẩn hóa chuỗi loại bỏ dấu).
+* **Tìm kiếm song song**: Tìm kiếm đồng thời theo Chữ giản/phồn, Pinyin (có/không dấu), âm Hán-Việt hoặc nghĩa tiếng Việt (tự động chuẩn hóa chiỗi loại bỏ dấu).
 * **Thông tin chi tiết chuyên sâu**:
   - Tích hợp phát âm giọng bản xứ `🔊`, bộ thủ, mẹo ghi nhớ chữ Hán.
   - **Sơ đồ tiến hóa chữ viết cổ đại**: Mô phỏng sự tiến hóa của chữ Hán qua 4 thời kỳ lịch sử tiêu biểu: *Giáp Cốt Văn (Oracle Bone), Kim Văn (Bronze), Tiểu Triện (Seal), Khải Thư (Regular Script)* với thiết kế giả lập chất liệu lịch sử (xương khắc, đồng đúc, dấu ấn, nét cọ).
@@ -141,12 +141,10 @@ Lệnh này sẽ tự động chạy biên dịch dự án (`predeploy`) và đ�
 
 ## 📄 Bản quyền & Đóng góp
 
-Dự án này được phân phối dưới giấy phép **MIT License** – một giấy phép mã nguồn mở cực kỳ phổ biến, cho phép tự do sử dụng, chỉnh sửa và phân phối lại.
+Dự án này được phân phối dưới giấy phép **GNU General Public License v3 (GPL v3)** – một giấy phép mã nguồn mở cực kỳ mạnh mẽ bảo vệ tối đa quyền lợi của cộng đồng phát triển mã nguồn mở (Copyleft).
 
-> **Lưu ý về Tác quyền**:
-> Giấy phép MIT rất thông thoáng nhưng yêu cầu bắt buộc bất kỳ bản sao hoặc sản phẩm phái sinh nào sử dụng mã nguồn này cũng phải đính kèm thông báo bản quyền (Copyright Notice) gốc và tuyên bố miễn trừ trách nhiệm của tác giả.
->
-> Nếu bạn muốn đảm bảo mọi cải tiến hoặc phiên bản sửa đổi từ dự án này bắt buộc cũng phải được mở mã nguồn (Copyleft), bạn có thể cân nhắc chuyển đổi sang giấy phép **GNU GPL v3**.
+> **Ý nghĩa của GNU GPL v3**:
+> Giấy phép GPL v3 đảm bảo rằng ứng dụng này sẽ mãi mãi là phần mềm tự do và mã nguồn mở. Bất kỳ ai sử dụng, sửa đổi hoặc tạo ra sản phẩm phái sinh từ ứng dụng này và phân phối ra ngoài **bắt buộc phải mở mã nguồn** của sản phẩm đó dưới cùng giấy phép GPL v3. Điều này ngăn chặn triệt để việc thương mại hóa đóng mã nguồn (proprietary fork) từ các cải tiến của dự án.
 
 Mọi đóng góp, báo lỗi hoặc đề xuất cải tiến tính năng đều được hoan nghênh nhiệt liệt thông qua phần **Issues** hoặc **Pull Requests** trên GitHub.
 
