@@ -6,6 +6,7 @@ import SkillReading from "./components/SkillReading";
 import SkillListening from "./components/SkillListening";
 import SkillSpeaking from "./components/SkillSpeaking";
 import DictionaryModal from "./components/DictionaryModal";
+import { translations } from "./data/translations";
 
 export default function App() {
   // Global States (loaded from localStorage with safe default fallbacks)
@@ -15,6 +16,13 @@ export default function App() {
   const [xp, setXp] = useState(() => Number(localStorage.getItem("chinese_xp")) || 0);
   const [streak, setStreak] = useState(() => Number(localStorage.getItem("chinese_streak")) || 1);
   const [soundOn, setSoundOn] = useState(() => JSON.parse(localStorage.getItem("chinese_sound")) !== false);
+  const [uiLang, setUiLang] = useState(() => localStorage.getItem("chinese_ui_lang") || "vi");
+
+  useEffect(() => {
+    localStorage.setItem("chinese_ui_lang", uiLang);
+  }, [uiLang]);
+
+  const t = (key) => (translations[uiLang] && translations[uiLang][key]) || key;
   
   // Custom Vocabulary State (stored locally)
   const [customWords, setCustomWords] = useState(() => {
@@ -210,6 +218,8 @@ export default function App() {
             addXp={addXpPoints}
             triggerMascot={triggerMascotReaction}
             playSound={playSound}
+            uiLang={uiLang}
+            t={t}
           />
         );
       case "speaking":
@@ -242,40 +252,43 @@ export default function App() {
         setSelectedLevel={setSelectedLevel}
         onOpenHelp={() => setHelpOpen(true)}
         onOpenDict={() => setIsDictOpen(true)}
+        uiLang={uiLang}
+        setUiLang={setUiLang}
+        t={t}
       />
 
       <main className="app-container flex-spacer" style={{ width: "100%" }}>
         <div className="main-grid">
           {/* Sidebar Menu */}
           <aside className="sidebar-panel glass-panel">
-            <h2 className="sidebar-title">Kỹ năng học tập</h2>
+            <h2 className="sidebar-title">{t("sidebarTitle")}</h2>
             
             <button
               className={`nav-card ${activeSkill === "writing" ? "active" : ""}`}
               onClick={() => setActiveSkill("writing")}
             >
-              <span className="nav-icon">✍️</span> Luyện viết chữ
+              <span className="nav-icon">✍️</span> {t("navWriting")}
             </button>
 
             <button
               className={`nav-card ${activeSkill === "reading" ? "active" : ""}`}
               onClick={() => setActiveSkill("reading")}
             >
-              <span className="nav-icon">📖</span> Luyện đọc hiểu
+              <span className="nav-icon">📖</span> {t("navReading")}
             </button>
 
             <button
               className={`nav-card ${activeSkill === "listening" ? "active" : ""}`}
               onClick={() => setActiveSkill("listening")}
             >
-              <span className="nav-icon">🎧</span> Luyện nghe âm
+              <span className="nav-icon">🎧</span> {t("navListening")}
             </button>
 
             <button
               className={`nav-card ${activeSkill === "speaking" ? "active" : ""}`}
               onClick={() => setActiveSkill("speaking")}
             >
-              <span className="nav-icon">🗣️</span> Luyện phát âm
+              <span className="nav-icon">🗣️</span> {t("navSpeaking")}
             </button>
           </aside>
 
@@ -289,13 +302,13 @@ export default function App() {
               <div className="card-header-bar">
                 <div>
                   <h2 className="card-title">
-                    {activeSkill === "writing" && "Viết chữ Hán (Stroke Practice)"}
-                    {activeSkill === "reading" && "Đọc đoạn hội thoại (Reading Text)"}
-                    {activeSkill === "listening" && "Nghe từ vựng & Câu (Dictation Check)"}
-                    {activeSkill === "speaking" && "Luyện phát âm chuẩn (Mandarin Pronunciation)"}
+                    {activeSkill === "writing" && t("cardTitleWriting")}
+                    {activeSkill === "reading" && t("cardTitleReading")}
+                    {activeSkill === "listening" && t("cardTitleListening")}
+                    {activeSkill === "speaking" && t("cardTitleSpeaking")}
                   </h2>
                   <p className="card-subtitle">
-                    {mode === "simplified" ? `Cấp độ HSK ${selectedLevel} · Hệ Giản thể` : `Cấp độ TOCFL ${selectedLevel} · Hệ Phồn thể`}
+                    {mode === "simplified" ? `${t("levelPrefix")} ${selectedLevel} · ${t("modeSimplified")}` : `${t("levelPrefix")} ${selectedLevel} · ${t("modeTraditional")}`}
                   </p>
                 </div>
                 <span className="theme-badge">
@@ -308,6 +321,38 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="mobile-bottom-nav">
+        <button
+          className={`mobile-nav-btn ${activeSkill === "writing" ? "active" : ""}`}
+          onClick={() => setActiveSkill("writing")}
+        >
+          <span className="mobile-nav-icon">✍️</span>
+          <span className="mobile-nav-label">{t("navWriting")}</span>
+        </button>
+        <button
+          className={`mobile-nav-btn ${activeSkill === "reading" ? "active" : ""}`}
+          onClick={() => setActiveSkill("reading")}
+        >
+          <span className="mobile-nav-icon">📖</span>
+          <span className="mobile-nav-label">{t("navReading")}</span>
+        </button>
+        <button
+          className={`mobile-nav-btn ${activeSkill === "listening" ? "active" : ""}`}
+          onClick={() => setActiveSkill("listening")}
+        >
+          <span className="mobile-nav-icon">🎧</span>
+          <span className="mobile-nav-label">{t("navListening")}</span>
+        </button>
+        <button
+          className={`mobile-nav-btn ${activeSkill === "speaking" ? "active" : ""}`}
+          onClick={() => setActiveSkill("speaking")}
+        >
+          <span className="mobile-nav-icon">🗣️</span>
+          <span className="mobile-nav-label">{t("navSpeaking")}</span>
+        </button>
+      </nav>
 
       {/* Modern Duolingo-style instructional modal */}
       {helpOpen && (

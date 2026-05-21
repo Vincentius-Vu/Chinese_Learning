@@ -4468,7 +4468,8 @@ export const listeningData = [
       "Cảm ơn bạn, tạm biệt!",
       "Xin chào bạn, tạm biệt!",
       "Tôi là bác sĩ, cảm ơn bạn!"
-    ]
+    ],
+    explanation: "Phát âm: 'xièxie nǐ, zàijiàn!' dịch nghĩa là 'Cảm ơn bạn, tạm biệt!' (谢谢 - xièxie: cảm ơn; 再见 - zàijiàn: tạm biệt)."
   },
   {
     id: "l2",
@@ -4481,7 +4482,8 @@ export const listeningData = [
       "Cô ấy là học sinh của tôi.",
       "Ông ấy là giáo viên tiếng Trung của tôi.",
       "Họ là bạn học của tôi."
-    ]
+    ],
+    explanation: "Phát âm: 'tā shì wǒ de Hànyǔ lǎoshī.' dịch nghĩa là 'Ông ấy là giáo viên tiếng Trung của tôi.' (他 - tā: anh ấy/ông ấy; 汉语 - Hànyǔ: tiếng Trung; 老师 - lǎoshī: giáo viên)."
   },
   {
     id: "l3",
@@ -4494,7 +4496,8 @@ export const listeningData = [
       "Tôi muốn uống một cốc nước.",
       "Tôi không thích ăn hoa quả.",
       "Tôi muốn mua một ít táo."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ xiǎng mǎi xiē píngguǒ.' dịch nghĩa là 'Tôi muốn mua một ít táo.' (想 - xiǎng: muốn; 买 - mǎi: mua; 苹果 - píngguǒ: quả táo)."
   },
   {
     id: "l4",
@@ -4507,7 +4510,8 @@ export const listeningData = [
       "Hôm nay trời mưa to.",
       "Hôm nay thời tiết rất tốt.",
       "Hôm qua trời rất lạnh."
-    ]
+    ],
+    explanation: "Phát âm: 'jīntiān tiānqì hěn hǎo.' dịch nghĩa là 'Hôm nay thời tiết rất tốt.' (今天 - jīntiān: hôm nay; 天气 - tiānqì: thời tiết; 很好 - hěn hǎo: rất tốt)."
   },
   {
     id: "l5",
@@ -4520,7 +4524,8 @@ export const listeningData = [
       "Bạn biết nói tiếng Trung không?",
       "Bạn có sách chữ Hán không?",
       "Bạn biết viết chữ Hán không?"
-    ]
+    ],
+    explanation: "Phát âm: 'nǐ huì xiě Hànzì ma?' dịch nghĩa là 'Bạn biết viết chữ Hán không?' (会 - huì: biết; 写 - xiě: viết; 汉字 - Hànzì: chữ Hán)."
   },
 
   // LEVEL 2 (HSK 2 / TOCFL 2)
@@ -4535,7 +4540,8 @@ export const listeningData = [
       "Bạn có xe máy mới đúng không?",
       "Bạn có nhìn thấy xe đạp của tôi không?",
       "Tôi đang đợi tàu hỏa đến đây."
-    ]
+    ],
+    explanation: "Phát âm: 'nǐ kànjiàn wǒ de zìxíngchē le ma?' dịch nghĩa là 'Bạn có nhìn thấy xe đạp của tôi không?' (看见 - kànjiàn: nhìn thấy; 自行车 - zìxíngchē: xe đạp)."
   },
   {
     id: "l7",
@@ -4548,7 +4554,8 @@ export const listeningData = [
       "Bên ngoài thời tiết rất ấm áp, hãy ra ngoài chơi đi.",
       "Bên ngoài trời đang mưa to, đừng đi ra ngoài nữa.",
       "Tôi muốn đi mua hoa quả cùng bạn."
-    ]
+    ],
+    explanation: "Phát âm: 'wàimiàn zhèngzài xià dàyǔ, bié chūqù le.' dịch nghĩa là 'Bên ngoài trời đang mưa to, đừng đi ra ngoài nữa.' (外面 - wàimiàn: bên ngoài; 正在 - zhèngzài: đang; 下大雨 - xià dàyǔ: mưa to; 别 - bié: đừng)."
   },
   {
     id: "l8",
@@ -4561,7 +4568,8 @@ export const listeningData = [
       "Tôi và bạn học đang làm bài kiểm tra trong lớp.",
       "Tôi muốn đi thư viện mượn sách.",
       "Tôi làm việc trong bệnh viện rất mệt mỏi."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ hé tóngxué zhèngzài jiàoshì lǐ kǎoshì.' dịch nghĩa là 'Tôi và bạn học đang làm bài kiểm tra trong lớp.' (同学 - tóngxué: bạn học; 教室 - jiàoshì: lớp học; 考试 - kǎoshì: kiểm tra/thi)."
   },
   {
     id: "l9",
@@ -4574,7 +4582,8 @@ export const listeningData = [
       "Xin hỏi, quả táo này nặng bao nhiêu cân?",
       "Xin hỏi, nhà vệ sinh ở hướng nào?",
       "Xin hỏi, cà phê ở đây bao nhiêu tiền một ly?"
-    ]
+    ],
+    explanation: "Phát âm: 'qǐngwèn, zhèr de kāfēi duōshao qián yì bēi?' dịch nghĩa là 'Xin hỏi, cà phê ở đây bao nhiêu tiền một ly?' (请问 - qǐngwèn: xin hỏi; 咖啡 - kāfēi: cà phê; 多少钱 - duōshao qián: bao nhiêu tiền; 一杯 - yì bēi: một ly/tách)."
   },
   {
     id: "l10",
@@ -4587,7 +4596,8 @@ export const listeningData = [
       "Con chó của tôi chạy rất nhanh ngoài sân.",
       "Con mèo của tôi bị ốm rồi, tôi phải đưa nó đi bệnh viện.",
       "Tôi thích ăn cá chiên ở nhà hàng."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ de māo shēngbìng le, wǒ yào dài tā qù yīyuàn.' dịch nghĩa là 'Con mèo của tôi bị ốm rồi, tôi phải đưa nó đi bệnh viện.' (猫 - māo: con mèo; 生病 - shēngbìng: bị ốm/sinh bệnh; 医院 - yīyuàn: bệnh viện)."
   },
 
   // LEVEL 3 (HSK 3 / TOCFL 3)
@@ -4602,7 +4612,8 @@ export const listeningData = [
       "Tôi rất đói, chúng ta đi ăn cái gì đó đi.",
       "Tôi rất khát, hãy cho tôi cốc nước.",
       "Tôi mệt rồi, tôi muốn ngủ."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ hěn è, wǒmen qù chī diǎn dōngxi ba.' dịch nghĩa là 'Tôi rất đói, chúng ta đi ăn cái gì đó đi.' (饿 - è: đói; 吃点东西 - chī diǎn dōngxi: ăn chút gì đó; 吧 - ba: nhé/đi)."
   },
   {
     id: "l12",
@@ -4615,7 +4626,8 @@ export const listeningData = [
       "Bài tiếng Trung này rất thú vị.",
       "Bài toán này khó quá, tôi không biết làm.",
       "Học tiếng Trung rất dễ, tôi rất thích."
-    ]
+    ],
+    explanation: "Phát âm: 'zhè dào shùxué tí tài nán le, wǒ bú huì zuò.' dịch nghĩa là 'Bài toán này khó quá, tôi không biết làm.' (数学题 - shùxué tí: bài toán; 难 - nán: khó; 不会 - bú huì: không biết; 做 - zuò: làm)."
   },
   {
     id: "l13",
@@ -4628,7 +4640,8 @@ export const listeningData = [
       "Thư viện của trường học vô cùng yên tĩnh.",
       "Cửa hàng này bán rất nhiều đồ ăn ngon.",
       "Bệnh viện này lúc nào cũng ồn ào."
-    ]
+    ],
+    explanation: "Phát âm: 'xuéxiào de túshūguǎn fēicháng ānjìng.' dịch nghĩa là 'Thư viện của trường học vô cùng yên tĩnh.' (图书馆 - túshūguǎn: thư viện; 非常 - fēicháng: vô cùng/rất; 安静 - ānjìng: yên tĩnh)."
   },
   {
     id: "l14",
@@ -4641,7 +4654,8 @@ export const listeningData = [
       "Tôi đói bụng quá, thèm ăn tối.",
       "Tôi ăn no rồi, cảm ơn bữa tối của bạn.",
       "Mèo của tôi bị ốm không muốn ăn gì."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ chī bǎo le, xièxie nǐ de wǎncān.' dịch nghĩa là 'Tôi ăn no rồi, cảm ơn bữa tối của bạn.' (吃饱 - chī bǎo: ăn no; 谢谢 - xièxie: cảm ơn; 晚餐 - wǎncān: bữa tối)."
   },
   {
     id: "l15",
@@ -4654,7 +4668,8 @@ export const listeningData = [
       "Tôi cảm thấy học tiếng Trung rất dễ và nhanh.",
       "Tôi không thích học tiếng Trung vì nó chán.",
       "Tôi cảm thấy học tiếng Trung không dễ, nhưng rất thú vị."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ juéde xué Zhōngwén bù róngyì, dànshì hěn yǒuqù.' dịch nghĩa là 'Tôi cảm thấy học tiếng Trung không dễ, nhưng rất thú vị.' (觉得 - juéde: cảm thấy; 不容易 - bù róngyì: không dễ dàng; 但是 - dànshì: nhưng; 有趣 - yǒuqù: thú vị)."
   },
 
   // LEVEL 4 (HSK 4 / TOCFL 4)
@@ -4866,7 +4881,8 @@ export const listeningData = [
       "Tháng sau, tôi dự định đi du lịch Bắc Kinh bằng tàu cao tốc cùng gia đình.",
       "Tôi vừa trở về sau chuyến du lịch Bắc Kinh bằng máy bay cùng bạn bè.",
       "Gia đình tôi không có kế hoạch đi du lịch đâu cả trong năm nay."
-    ]
+    ],
+    explanation: "Phát âm: 'xià ge yuè, wǒ dǎsuàn hé jiārén yìqǐ zuò gāotiě qù Běijīng lǚyóu.' dịch nghĩa là 'Tháng sau, tôi dự định đi du lịch Bắc Kinh bằng tàu cao tốc cùng gia đình.' (打算 - dǎsuàn: dự định; 一起 - yìqǐ: cùng nhau; 高铁 - gāotiě: tàu cao tốc; 旅游 - lǚyóu: du lịch)."
   },
   {
     id: "l32",
@@ -4893,7 +4909,8 @@ export const listeningData = [
       "Tôi đi đến trường học vào 3 giờ chiều.",
       "Tôi đi bệnh viện lúc 3 giờ chiều.",
       "Tôi muốn ngủ lúc 3 giờ chiều."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ xiàwǔ sān diǎn qù xuéxiào.' dịch nghĩa là 'Tôi đi đến trường học vào 3 giờ chiều.' (下午 - xiàwǔ: buổi chiều; 三点 - sān diǎn: 3 giờ; 学校 - xuéxiào: trường học)."
   },
   {
     id: "l34",
@@ -4906,7 +4923,8 @@ export const listeningData = [
       "Tôi muốn uống sữa, không muốn uống nước.",
       "Tôi muốn uống trà, không muốn uống nước.",
       "Tôi muốn uống trà nóng, không muốn ăn cơm."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ xiǎng hē chá, bù xiǎng hē shuǐ.' dịch nghĩa là 'Tôi muốn uống trà, không muốn uống nước.' (喝茶 - hē chá: uống trà; 喝水 - hē shuǐ: uống nước)."
   },
   {
     id: "l35",
@@ -4919,7 +4937,8 @@ export const listeningData = [
       "Trưa hôm nay chúng tôi ăn cơm ở nhà.",
       "Trưa hôm qua chúng tôi ăn cơm ở trường.",
       "Tối hôm nay chúng tôi đi ăn nhà hàng."
-    ]
+    ],
+    explanation: "Phát âm: 'jīntiān zhōngwǔ wǒmen zài jiā chīfàn.' dịch nghĩa là 'Trưa hôm nay chúng tôi ăn cơm ở nhà.' (中午 - zhōngwǔ: buổi trưa; 在家 - zài jiā: ở nhà; 吃饭 - chīfàn: ăn cơm)."
   },
   {
     id: "l36",
@@ -4932,7 +4951,8 @@ export const listeningData = [
       "Điện thoại di động của mẹ ở trên giường.",
       "Điện thoại di động của bố ở trên bàn.",
       "Quyển sách của tôi ở trên bàn."
-    ]
+    ],
+    explanation: "Phát âm: 'bàba de shǒujī zài zhuōzi shàng.' dịch nghĩa là 'Điện thoại di động của bố ở trên bàn.' (手机 - shǒujī: điện thoại di động; 桌子 - zhuōzi: cái bàn; 上 - shàng: trên)."
   },
   {
     id: "l37",
@@ -4945,7 +4965,8 @@ export const listeningData = [
       "Tôi biết giáo viên tiếng Trung kia.",
       "Tôi không quen biết người cao lớn kia.",
       "Tôi rất thích chú mèo nhỏ kia."
-    ]
+    ],
+    explanation: "Phát âm: 'wǒ bú rènshi nàge gāo gèzi de rén.' dịch nghĩa là 'Tôi không quen biết người cao lớn kia.' (认识 - rènshi: quen biết; 那个 - nàge: cái đó/người kia; 高个子 - gāo gèzi: người dáng cao)."
   },
   {
     id: "l38",
@@ -4958,7 +4979,8 @@ export const listeningData = [
       "Tuần sau chúng tôi sẽ đi Bắc Kinh.",
       "Tháng sau gia đình tôi sẽ đi du lịch.",
       "Hôm nay chúng tôi đi tàu cao tốc."
-    ]
+    ],
+    explanation: "Phát âm: 'xià ge xīngqī wǒmen yào qù Běijīng.' dịch nghĩa là 'Tuần sau chúng tôi sẽ đi Bắc Kinh.' (下个星期 - xià ge xīngqī: tuần sau; 要 - yào: sẽ/muốn; 北京 - Běijīng: Bắc Kinh)."
   }];
 
 // --- 🗣️ KỸ NĂNG NÓI (SPEAKING) ---

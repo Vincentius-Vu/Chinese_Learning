@@ -6,7 +6,9 @@ export default function SkillListening({
   selectedLevel,
   addXp,
   triggerMascot,
-  playSound
+  playSound,
+  uiLang = "vi",
+  t
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -29,7 +31,7 @@ export default function SkillListening({
 
   useEffect(() => {
     resetCard();
-    triggerMascot("Luyện nghe chuẩn xác! Hãy bấm vào nút loa chính hoặc nút rùa 🐢 để nghe phát âm, sau đó chọn nghĩa chính xác nhé! 🎧", "neutral");
+    triggerMascot(t("mascotListeningPrompt"), "neutral");
   }, [currentIndex, mode]);
 
   // Reset states
@@ -105,15 +107,15 @@ export default function SkillListening({
       <div className="listening-layout glass-panel" style={{ padding: "40px", textAlign: "center" }}>
         <span style={{ fontSize: "4.5rem", display: "block", marginBottom: "15px" }}>🏆</span>
         <h2 style={{ fontSize: "1.8rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))", marginBottom: "10px" }}>
-          Hoàn Thành Bài Nghe!
+          {t("listeningTitle")}
         </h2>
         <p style={{ fontWeight: 700, color: "hsl(var(--neutral-gray))", marginBottom: "25px", fontSize: "1.05rem" }}>
-          Kết quả của bạn: {score} / {filteredListeningData.length} câu trả lời đúng
+          {t("listeningResult")}: {score} / {filteredListeningData.length}
         </p>
         
         <div style={{ display: "flex", gap: "15px", justifyContent: "center" }}>
           <button className="btn btn-primary" onClick={handleRestart}>
-            🔄 Luyện tập lại
+            {t("btnRestart")}
           </button>
         </div>
       </div>
@@ -139,7 +141,7 @@ export default function SkillListening({
       </div>
 
       <div className="listening-question-prompt">
-        Câu {currentIndex + 1} / {filteredListeningData.length}: Nhấp để nghe âm thanh tiếng Trung
+        {t("levelPrefix")} {currentIndex + 1} / {filteredListeningData.length}: {t("listeningPrompt")}
       </div>
 
       {/* Main Speakers */}
@@ -148,7 +150,7 @@ export default function SkillListening({
         <button
           className="audio-btn audio-btn-slow"
           onClick={() => handlePlayAudio(0.5)}
-          title="Nghe chậm (Giọng rùa 🐢)"
+          title={t("listeningSlowTitle")}
         >
           🐢
         </button>
@@ -157,7 +159,7 @@ export default function SkillListening({
         <button
           className="audio-btn audio-btn-main"
           onClick={() => handlePlayAudio(0.9)}
-          title="Nghe tốc độ tiêu chuẩn (🔊)"
+          title={t("listeningNormalTitle")}
         >
           🔊
         </button>
@@ -187,6 +189,18 @@ export default function SkillListening({
         })}
       </div>
 
+      {/* Explanation Block for Levels 1, 2, 3 */}
+      {isAnswered && selectedLevel <= 3 && activeQuestion.explanation && (
+        <div className="explanation-card glass-panel" style={{ marginTop: "20px", padding: "15px 20px", borderLeft: "4px solid hsl(var(--primary-teal))", background: "rgba(20, 184, 166, 0.05)", borderRadius: "8px", textAlign: "left" }}>
+          <h4 style={{ fontWeight: 800, color: "hsl(var(--primary-teal-dark))", marginBottom: "8px", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.95rem" }}>
+            {t("explanationTitle") || "📚 Giải thích đáp án:"}
+          </h4>
+          <p style={{ fontSize: "0.9rem", lineHeight: 1.6, color: "hsl(var(--neutral-gray-dark))", margin: 0 }}>
+            {activeQuestion.explanation}
+          </p>
+        </div>
+      )}
+
       {/* Navigation Footer */}
       <div className="status-bar-interactive">
         {!isAnswered ? (
@@ -195,11 +209,11 @@ export default function SkillListening({
             disabled={selectedOption === null}
             onClick={handleCheckAnswer}
           >
-            ✓ Kiểm tra kết quả
+            {t("btnSubmit")}
           </button>
         ) : (
           <button className="btn btn-secondary" onClick={handleNext}>
-            {currentIndex === filteredListeningData.length - 1 ? "🏆 Kết thúc" : "Tiếp theo ➜"}
+            {currentIndex === filteredListeningData.length - 1 ? t("btnFinish") : t("btnNext")}
           </button>
         )}
       </div>
