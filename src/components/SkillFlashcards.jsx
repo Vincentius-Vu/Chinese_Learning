@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { sinoVietMap } from "../data/sinoVietMap";
 import { typingData } from "../data/typingData";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 
 export default function SkillFlashcards({
   mode,
@@ -17,6 +18,21 @@ export default function SkillFlashcards({
   globalVocabularyPool = [],
   customWords = []
 }) {
+  // Native Mobile vibration helper
+  const triggerVibration = async (type = "light") => {
+    try {
+      if (type === "error") {
+        await Haptics.vibrate({ duration: 150 });
+      } else if (type === "success") {
+        await Haptics.impact({ style: ImpactStyle.Medium });
+      } else {
+        await Haptics.impact({ style: ImpactStyle.Light });
+      }
+    } catch (e) {
+      // Ignore on web browser without haptic hardware
+    }
+  };
+
   // Deck selection states
   const [activeDeck, setActiveDeck] = useState(null); // 'level' | 'custom' | 'weakness' | null
   const [deckCards, setDeckCards] = useState([]);
@@ -203,6 +219,7 @@ export default function SkillFlashcards({
 
     if (isCorrect) {
       // MASTERED / STUDIED SUCCESSFULLY
+      triggerVibration("success");
       playSound("correct");
       setCardAnimation("card-slide-out-right");
       
@@ -235,6 +252,7 @@ export default function SkillFlashcards({
 
     } else {
       // NOT MEMORIZED YET
+      triggerVibration("error");
       playSound("wrong");
       setCardAnimation("card-shake");
       
@@ -330,9 +348,11 @@ export default function SkillFlashcards({
     addReviewLogs([newLog]);
 
     if (isCorrect) {
+      triggerVibration("success");
       playSound("correct");
       triggerMascot("Chính xác! Bạn nhớ từ rất tốt! 🟢", "excited");
     } else {
+      triggerVibration("error");
       playSound("wrong");
       triggerMascot("Opps! Đáp án chưa chính xác rồi. 🔴", "sad");
     }
@@ -373,6 +393,7 @@ export default function SkillFlashcards({
     };
     addReviewLogs([newLog]);
 
+    triggerVibration("error");
     playSound("wrong");
     triggerMascot("Không sao, chúng ta sẽ ôn lại sau nhé!", "neutral");
 

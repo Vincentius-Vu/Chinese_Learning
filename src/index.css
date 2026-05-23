@@ -3573,5 +3573,29 @@ canvas, .canvas-wrapper canvas {
   font-weight: 700;
 }
 
+/* Mobile App Native Webview Optimizations */
+html, body {
+  overscroll-behavior-y: contain; /* Disable pull-to-refresh on Android Chrome/WebView */
+  -webkit-tap-highlight-color: transparent; /* Remove the grey highlight color when tapping items */
+}
+
+/* Prevent accidental text selection across interactive cards */
+.deck-card,
+.flashcard-wrapper,
+.flashcard-choice-btn,
+.rating-btn,
+.mascot-container {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; /* Disable native touch callouts / image saves */
+}
+
+/* Enhance scrolling momentum on iOS WebViews */
+.deck-grid,
+.vocab-list,
+.reading-story-content {
+  -webkit-overflow-scrolling: touch;
+}
+
 
 

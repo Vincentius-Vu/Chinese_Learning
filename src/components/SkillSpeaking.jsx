@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { speakingData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
+import { Capacitor } from "@capacitor/core";
+import { SpeechRecognition as NativeSpeechRecognition } from "@capacitor-community/speech-recognition";
 
 // ── Pinyin & Levenshtein Helper Functions for Homophone-Resistant Matching ──
 let charPinyinLookup = null;
@@ -153,6 +155,10 @@ export default function SkillSpeaking({
 
   // Initialize Speech Recognition
   useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      setHasMicSupport(true);
+      return;
+    }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setHasMicSupport(false);
@@ -349,7 +355,55 @@ export default function SkillSpeaking({
   };
 
   // Trigger microphone recording
-  const handleToggleRecord = () => {
+  const handleToggleRecord = async () => {
+    if (Capacitor.isNativePlatform()) {
+      if (isRecording) {
+        try {
+          await NativeSpeechRecognition.stop();
+        } catch (e) {
+          console.warn("Failed to stop native speech recognition", e);
+        }
+        setIsRecording(false);
+      } else {
+        try {
+          const perm = await NativeSpeechRecognition.requestPermission();
+          if (!perm.granted) {
+            setErrorMsg(t("errorMicDenied"));
+            triggerMascot(t("mascotSpeakingMicAlert"), "sad");
+            return;
+          }
+          
+          setIsRecording(true);
+          setTranscript("");
+          setScore(null);
+          setErrorMsg("");
+          triggerMascot(t("mascotSpeakingRecording"), "thinking");
+
+          NativeSpeechRecognition.start({
+            language: mode === "simplified" ? "zh-CN" : "zh-TW",
+            maxResults: 1,
+            partialResults: false,
+            popup: false
+          });
+
+          // Listening to result
+          NativeSpeechRecognition.addListener('partialResults', (data) => {
+            if (data.matches && data.matches.length > 0) {
+              const spokenText = data.matches[0];
+              setTranscript(spokenText);
+              gradeUserSpeech(spokenText);
+              setIsRecording(false);
+              NativeSpeechRecognition.removeAllListeners();
+            }
+          });
+        } catch (err) {
+          setIsRecording(false);
+          setErrorMsg(`Error: ${err.message || err}`);
+        }
+      }
+      return;
+    }
+
     if (!hasMicSupport || !speechRecognizer) {
       simulateSpeaking();
       return;
