@@ -10,6 +10,7 @@ const getTranscriber = async (progress_callback) => {
   if (!transcriber) {
     transcriber = await pipeline('automatic-speech-recognition', 'onnx-community/whisper-tiny', {
       progress_callback,
+      quantized: false, // Force stable unquantized model to fix ONNX Runtime Web TransposeDQWeights error
     });
   }
   return transcriber;
