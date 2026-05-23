@@ -1,34 +1,33 @@
 import os
 import shutil
-import glob
 
 artifact_dir = r"C:\Users\T14\.gemini\antigravity\brain\afd7d9a7-4cfc-4e09-86a1-ddbb11f737f6"
-target_dir = r"public/images/stories"
+target_dir = r"c:\Users\T14\Documents\GitHub\Chinese_Learning\public\images\stories"
 
-os.makedirs(target_dir, exist_ok=True)
+# Mapping of file prefixes to their final names
+files = [
+    ("story_r43", "r43.webp"),
+    ("story_r44", "r44.webp"),
+    ("story_r45", "r45.webp"),
+    ("story_r46", "r46.webp"),
+    ("story_r47", "r47.webp")
+]
 
-mappings = {
-    "story_r8": "r8.webp",
-    "story_r9": "r9.webp",
-    "story_r10": "r10.webp",
-    "story_r18": "r18.webp",
-    "story_r32": "r32.webp",
-    "story_r33": "r33.webp",
-    "story_r34": "r34.webp",
-    "story_r11": "r11.webp"
-}
-
-for prefix, target_name in mappings.items():
-    search_pattern = os.path.join(artifact_dir, f"{prefix}_*.png")
-    matching_files = glob.glob(search_pattern)
-    
-    if matching_files:
-        # Get the latest one if multiple exist
-        source_file = max(matching_files, key=os.path.getmtime)
-        dest_file = os.path.join(target_dir, target_name)
-        shutil.copy2(source_file, dest_file)
-        print(f"Copied {os.path.basename(source_file)} -> {dest_file}")
-    else:
-        print(f"No file found for pattern: {prefix}_*.png")
-
-print("Copy completed!")
+# Find the exact filenames in the artifact directory
+for prefix, final_name in files:
+    for filename in os.listdir(artifact_dir):
+        if filename.startswith(prefix) and filename.endswith(".png"):
+            source_path = os.path.join(artifact_dir, filename)
+            target_path = os.path.join(target_dir, final_name)
+            
+            # Try to use PIL to convert to webp properly
+            try:
+                from PIL import Image
+                img = Image.open(source_path)
+                img.save(target_path, "webp")
+                print(f"Converted {filename} to {final_name} using PIL")
+            except ImportError:
+                # Fallback to copy and rename
+                shutil.copy(source_path, target_path)
+                print(f"Copied {filename} to {final_name} (no PIL)")
+            break
