@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { sinoVietMap } from "../data/sinoVietMap";
 import { typingData } from "../data/typingData";
-import { Haptics, ImpactStyle } from "@capacitor/haptics";
-
 export default function SkillFlashcards({
   mode,
   selectedLevel,
@@ -18,20 +16,8 @@ export default function SkillFlashcards({
   globalVocabularyPool = [],
   customWords = []
 }) {
-  // Native Mobile vibration helper
-  const triggerVibration = async (type = "light") => {
-    try {
-      if (type === "error") {
-        await Haptics.vibrate({ duration: 150 });
-      } else if (type === "success") {
-        await Haptics.impact({ style: ImpactStyle.Medium });
-      } else {
-        await Haptics.impact({ style: ImpactStyle.Light });
-      }
-    } catch (e) {
-      // Ignore on web browser without haptic hardware
-    }
-  };
+  // Pure Web empty vibration trigger
+  const triggerVibration = async () => {};
 
   // Deck selection states
   const [activeDeck, setActiveDeck] = useState(null); // 'level' | 'custom' | 'weakness' | null
