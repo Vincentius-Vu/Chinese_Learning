@@ -6,7 +6,9 @@ export default function SkillReading({
   selectedLevel,
   addXp,
   triggerMascot,
-  playSound
+  playSound,
+  uiLang = "vi",
+  t
 }) {
   const filteredReadingData = readingData.filter((r) => r.level === selectedLevel);
   const [selectedStoryId, setSelectedStoryId] = useState(() => filteredReadingData[0]?.id || "r1");
@@ -28,12 +30,25 @@ export default function SkillReading({
   const storyTitle = mode === "simplified" ? activeStory.titleSimplified : activeStory.titleTraditional;
   const storyContent = mode === "simplified" ? activeStory.contentSimplified : activeStory.contentTraditional;
 
+  const storiesWithCovers = ["r1", "r2", "r3", "r4", "r5", "r6", "r7", "r19", "r20", "r21", "r22", "r23"];
+  const hasCoverImage = storiesWithCovers.includes(activeStory.id);
+
+  const getGenerativeGradient = (storyId) => {
+    let hash = 0;
+    for (let i = 0; i < storyId.length; i++) {
+      hash = storyId.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue1 = Math.abs(hash) % 360;
+    const hue2 = (hue1 + 40) % 360;
+    return `linear-gradient(135deg, hsl(${hue1}, 70%, 45%) 0%, hsl(${hue2}, 75%, 35%) 100%)`;
+  };
+
   // Reset states when story or mode changes
   useEffect(() => {
     setSelectedWord(null);
     setQuizAnswers({});
     setQuizSubmitted({});
-    triggerMascot("Hãy đọc kỹ đoạn văn dưới đây. Bạn có thể nhấn vào bất kỳ từ nào để tra cứu nghĩa và phát âm nhé! 📖", "neutral");
+    triggerMascot(t("mascotReadingWelcome"), "neutral");
   }, [selectedStoryId, mode]);
 
   // Handle character lookup clicks
@@ -49,29 +64,48 @@ export default function SkillReading({
         pinyin: matched.pinyin,
         meaning: matched.meaning
       });
-      triggerMascot(`Từ "${char}" có nghĩa là: ${matched.meaning}. Nhấn nút 🔊 để nghe phát âm!`, "happy");
+      triggerMascot(t("mascotReadingWordMeaning").replace("{char}", char).replace("{meaning}", matched.meaning), "happy");
       playSound("correct");
     } else {
       // Fallback lookup (create clean character item)
       setSelectedWord({
         hanzi: char,
         pinyin: "-",
-        meaning: "Từ vựng bổ trợ trong câu"
+        meaning: t("labelVocabStudy")
       });
-      triggerMascot(`Bạn đang xem từ "${char}". Hãy xem các từ vựng cốt lõi bên dưới nhé!`, "thinking");
+      triggerMascot(t("mascotReadingWordDetail").replace("{char}", char), "thinking");
     }
   };
 
   // Speak vocabulary or full sentences using SpeechSynthesis
   const handleSpeak = (text) => {
     if (!window.speechSynthesis) {
-      triggerMascot("Trình duyệt không hỗ trợ tổng hợp giọng nói.", "sad");
+      triggerMascot(t("speechNotSupported"), "sad");
       return;
     }
-    window.speechSynthesis.cancel();
+    
+    // Safely cancel only if already speaking to avoid iOS deadlock
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = mode === "simplified" ? "zh-CN" : "zh-TW";
+    const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
+    utterance.lang = targetLang;
     utterance.rate = 0.85; // slightly slower for beginners
+    
+    // Select correct Chinese voice dynamically (crucial for mobile/iOS Safari)
+    try {
+      const voices = window.speechSynthesis.getVoices();
+      const zhVoice = voices.find(v => v.lang.toLowerCase() === targetLang.toLowerCase() || v.lang.toLowerCase().replace("_", "-") === targetLang.toLowerCase()) || 
+                      voices.find(v => v.lang.toLowerCase().startsWith("zh"));
+      if (zhVoice) {
+        utterance.voice = zhVoice;
+      }
+    } catch (e) {
+      console.warn("Failed to find voice dynamically", e);
+    }
+    
     window.speechSynthesis.speak(utterance);
   };
 
@@ -90,10 +124,10 @@ export default function SkillReading({
     if (userIdx === correctIdx) {
       playSound("success");
       addXp(10);
-      triggerMascot("Đáp án hoàn toàn chính xác! Tuyệt vời lắm bạn ơi, +10 XP! 🏆", "excited");
+      triggerMascot(t("mascotReadingCorrect"), "excited");
     } else {
       playSound("wrong");
-      triggerMascot("Câu trả lời chưa chính xác rồi. Hãy đọc lại bài và thử lại nhé! 🐃", "sad");
+      triggerMascot(t("mascotReadingWrong"), "sad");
     }
   };
 
@@ -145,7 +179,7 @@ export default function SkillReading({
       <div className="reading-menu">
         <div className="glass-panel" style={{ padding: "18px" }}>
           <h4 style={{ fontWeight: 800, fontSize: "0.9rem", color: "hsl(var(--neutral-gray))", marginBottom: "15px", textTransform: "uppercase" }}>
-            Danh sách bài đọc
+            {t("titleReadingList")}
           </h4>
           
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -197,7 +231,7 @@ export default function SkillReading({
               onClick={() => setShowPinyin(!showPinyin)}
               style={{ padding: "8px 16px", fontSize: "0.8rem" }}
             >
-              {showPinyin ? "🙈 Ẩn phiên âm (Pinyin)" : "👁️ Hiện phiên âm (Pinyin)"}
+              {showPinyin ? t("btnTogglePinyinHide") : t("btnTogglePinyinShow")}
             </button>
             
             <button
@@ -205,11 +239,42 @@ export default function SkillReading({
               onClick={() => handleSpeak(storyContent.replace(/[A-Z]:/g, ""))}
               style={{ padding: "8px 16px", fontSize: "0.8rem" }}
             >
-              🔊 Đọc cả bài thoại
+              {t("btnReadFullStory")}
             </button>
           </div>
 
-          <h2 className="reading-interactive-title">{storyTitle}</h2>
+          {/* Cover illustration banner header */}
+          <div className="reading-cover-banner">
+            {hasCoverImage ? (
+              <img 
+                src={`/images/stories/${activeStory.id}.webp`}
+                alt={storyTitle}
+                className="reading-cover-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  const fallback = e.target.nextSibling;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div 
+              className="reading-cover-fallback"
+              style={{ 
+                display: hasCoverImage ? 'none' : 'flex',
+                background: getGenerativeGradient(activeStory.id)
+              }}
+            >
+              <div className="cover-decorative-pattern">📖</div>
+            </div>
+          </div>
+
+          {/* Beautiful Story Title Header Card below the cover image */}
+          <div className="reading-story-header-card">
+            <span className="cover-badge">{t("levelPrefix")} {activeStory.level}</span>
+            <h2 className="cover-title-zh">{storyTitle}</h2>
+            <span className="cover-title-pinyin">{activeStory.pinyinTitle || ""}</span>
+            <span className="cover-title-vi">{activeStory.translationTitle || ""}</span>
+          </div>
 
           {/* Interactive Story Content */}
           <div className="story-narrative-box">
@@ -219,14 +284,14 @@ export default function SkillReading({
 
         {/* Translation Card Drawer */}
         <div className="translation-drawer">
-          <div className="translation-drawer-title">Bản dịch Tiếng Việt:</div>
+          <div className="translation-drawer-title">{t("labelTranslation")}</div>
           <div className="translation-drawer-body">{activeStory.translationText}</div>
         </div>
 
         {/* Comprehension Quiz section */}
         <div className="quiz-section">
           <h3 style={{ fontWeight: 800, fontSize: "1.2rem", color: "hsl(var(--neutral-dark))" }}>
-            🎯 Trắc Nghiệm Đọc Hiểu
+            {t("titleComprehensionQuiz")}
           </h3>
           
           {activeStory.quizzes.map((quiz, qIdx) => {
@@ -238,7 +303,7 @@ export default function SkillReading({
             return (
               <div key={qIdx} className="quiz-card">
                 <div className="quiz-question">
-                  Câu {qIdx + 1}: {quiz.question}
+                  {t("quizQuestionPrefix")} {qIdx + 1}: {quiz.question}
                 </div>
                 
                 <div className="quiz-options-list">
@@ -271,11 +336,11 @@ export default function SkillReading({
                       disabled={userSelection === undefined}
                       onClick={() => handleSubmitQuiz(qIdx, correctOptionIdx, userSelection)}
                     >
-                      ✓ Kiểm tra
+                      {t("btnCheckAnswer")}
                     </button>
                   ) : (
                     <div className={`quiz-feedback-box ${isCorrect ? "correct" : "wrong"}`}>
-                      {isCorrect ? "🎉 Chính xác!" : "❌ Chưa đúng!"} {quiz.explanation}
+                      {isCorrect ? t("feedbackCorrect") : t("feedbackWrong")} {quiz.explanation}
                     </div>
                   )}
                 </div>

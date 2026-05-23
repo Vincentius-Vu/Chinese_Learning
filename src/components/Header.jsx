@@ -14,6 +14,8 @@ export default function Header({
   onOpenDict,
   uiLang,
   setUiLang,
+  onExportProgress,
+  onImportProgress,
   t
 }) {
   // Calculate level progress (e.g. 100 XP per level)
@@ -27,8 +29,8 @@ export default function Header({
           <div className="logo-wrapper">
             <span className="logo-icon">🐃</span>
             <h1 className="logo-title">
-              Học Tiếng Trung
-              <span>4 Kỹ năng · HSK & TOCFL</span>
+              {t("logoTitle")}
+              <span>{t("logoSubtitle")}</span>
             </h1>
           </div>
 
@@ -150,6 +152,31 @@ export default function Header({
             >
               ❓
             </button>
+
+            {/* Backup Progress */}
+            <button
+              className="util-btn"
+              onClick={onExportProgress}
+              title={t("titleBackupExport")}
+              style={{ background: "rgba(34, 197, 94, 0.15)", borderColor: "rgba(34, 197, 94, 0.3)" }}
+            >
+              💾
+            </button>
+
+            {/* Restore Progress */}
+            <label
+              className="util-btn"
+              title={t("titleBackupImport")}
+              style={{ background: "rgba(168, 85, 247, 0.15)", borderColor: "rgba(168, 85, 247, 0.3)", cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center", margin: 0 }}
+            >
+              📂
+              <input
+                type="file"
+                accept=".json"
+                onChange={onImportProgress}
+                style={{ display: "none" }}
+              />
+            </label>
           </div>
         </div>
 

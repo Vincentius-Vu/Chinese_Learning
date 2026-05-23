@@ -5,8 +5,13 @@ import SkillWriting from "./components/SkillWriting";
 import SkillReading from "./components/SkillReading";
 import SkillListening from "./components/SkillListening";
 import SkillSpeaking from "./components/SkillSpeaking";
+import SkillTyping from "./components/SkillTyping";
+import SkillFlashcards from "./components/SkillFlashcards";
 import DictionaryModal from "./components/DictionaryModal";
 import { translations } from "./data/translations";
+import { writingData } from "./data/vocabulary";
+import { hskCompoundWords } from "./data/hskCompoundWords";
+import { calculateNewMastery } from "./lib/adaptiveLearning";
 
 export default function App() {
   // Global States (loaded from localStorage with safe default fallbacks)
@@ -17,6 +22,116 @@ export default function App() {
   const [streak, setStreak] = useState(() => Number(localStorage.getItem("chinese_streak")) || 1);
   const [soundOn, setSoundOn] = useState(() => JSON.parse(localStorage.getItem("chinese_sound")) !== false);
   const [uiLang, setUiLang] = useState(() => localStorage.getItem("chinese_ui_lang") || "vi");
+
+  // Mastery and Review Logs states for Adaptive learning
+  const [mastery, setMastery] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("chinese_mastery"));
+      const defaultMastery = {
+        writing: 1000,
+        reading: 1000,
+        listening: 1000,
+        speaking: 1000,
+        typing: 1000,
+        flashcards: 1000
+      };
+      if (stored) {
+        return { ...defaultMastery, ...stored };
+      }
+      return defaultMastery;
+    } catch (e) {
+      return { writing: 1000, reading: 1000, listening: 1000, speaking: 1000, typing: 1000, flashcards: 1000 };
+    }
+  });
+
+  const [reviewLogs, setReviewLogs] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("chinese_review_logs")) || [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  // Sync mastery and reviewLogs with localStorage
+  useEffect(() => {
+    localStorage.setItem("chinese_mastery", JSON.stringify(mastery));
+  }, [mastery]);
+
+  useEffect(() => {
+    localStorage.setItem("chinese_review_logs", JSON.stringify(reviewLogs));
+  }, [reviewLogs]);
+
+  // One-time silent unlock for Web Audio API & Web Speech API (TTS) on iOS/Mobile browsers
+  useEffect(() => {
+    const unlock = () => {
+      // 1. Unlock Web Audio API (for sound effects)
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          const ctx = new AudioContext();
+          if (ctx.state === "suspended") {
+            ctx.resume();
+          }
+          // Play a quick silent buffer
+          const buffer = ctx.createBuffer(1, 1, 22050);
+          const source = ctx.createBufferSource();
+          source.buffer = buffer;
+          source.connect(ctx.destination);
+          source.start(0);
+        }
+      } catch (e) {
+        console.warn("AudioContext unlock failed", e);
+      }
+
+      // 2. Unlock Web Speech API (for TTS)
+      try {
+        if (window.speechSynthesis) {
+          const u = new SpeechSynthesisUtterance("");
+          u.volume = 0; // completely silent
+          window.speechSynthesis.speak(u);
+        }
+      } catch (e) {
+        console.warn("SpeechSynthesis unlock failed", e);
+      }
+
+      // Clean up event listeners immediately after first user interaction
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("touchstart", unlock);
+    };
+
+    window.addEventListener("click", unlock);
+    window.addEventListener("touchstart", unlock);
+    return () => {
+      window.removeEventListener("click", unlock);
+      window.removeEventListener("touchstart", unlock);
+    };
+  }, []);
+
+  // Combine static HSK characters with compound words
+  const globalVocabularyPool = React.useMemo(() => {
+    return [...writingData, ...hskCompoundWords];
+  }, []);
+
+  const updateMasteryScore = (skill, percentCorrect) => {
+    setMastery(prev => {
+      const currentVal = prev[skill] !== undefined ? prev[skill] : 1000;
+      const newVal = calculateNewMastery(currentVal, percentCorrect);
+      return {
+        ...prev,
+        [skill]: newVal
+      };
+    });
+  };
+
+  const addReviewLogs = (newLogs) => {
+    setReviewLogs(prev => {
+      const combined = [...prev, ...newLogs];
+      if (combined.length > 1000) {
+        return combined.slice(combined.length - 1000);
+      }
+      return combined;
+    });
+  };
 
   useEffect(() => {
     localStorage.setItem("chinese_ui_lang", uiLang);
@@ -45,9 +160,76 @@ export default function App() {
   const handleRemoveCustomWord = (wordId) => {
     setCustomWords((prev) => prev.filter((w) => w.id !== wordId));
   };
+
+  const handleUpdateCustomWord = (updatedWord) => {
+    setCustomWords((prev) => prev.map((w) => w.id === updatedWord.id ? updatedWord : w));
+  };
+
+  const handleExportProgress = () => {
+    const data = {
+      chinese_mode: mode,
+      chinese_skill: activeSkill,
+      chinese_selected_level: selectedLevel,
+      chinese_xp: xp,
+      chinese_streak: streak,
+      chinese_sound: soundOn,
+      chinese_ui_lang: uiLang,
+      chinese_custom_words: customWords,
+      chinese_mastery: mastery,
+      chinese_review_logs: reviewLogs,
+      backup_time: new Date().toISOString(),
+      version: "1.2"
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const dateStr = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `chinese_learning_backup_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportProgress = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data && typeof data === "object") {
+          if (data.chinese_xp !== undefined) localStorage.setItem("chinese_xp", Number(data.chinese_xp));
+          if (data.chinese_streak !== undefined) localStorage.setItem("chinese_streak", Number(data.chinese_streak));
+          if (data.chinese_mode !== undefined) localStorage.setItem("chinese_mode", data.chinese_mode);
+          if (data.chinese_skill !== undefined) localStorage.setItem("chinese_skill", data.chinese_skill);
+          if (data.chinese_selected_level !== undefined) localStorage.setItem("chinese_selected_level", Number(data.chinese_selected_level));
+          if (data.chinese_sound !== undefined) localStorage.setItem("chinese_sound", JSON.stringify(data.chinese_sound));
+          if (data.chinese_ui_lang !== undefined) localStorage.setItem("chinese_ui_lang", data.chinese_ui_lang);
+          if (data.chinese_custom_words !== undefined && Array.isArray(data.chinese_custom_words)) {
+            localStorage.setItem("chinese_custom_words", JSON.stringify(data.chinese_custom_words));
+          }
+          if (data.chinese_mastery !== undefined) {
+            localStorage.setItem("chinese_mastery", JSON.stringify(data.chinese_mastery));
+          }
+          if (data.chinese_review_logs !== undefined) {
+            localStorage.setItem("chinese_review_logs", JSON.stringify(data.chinese_review_logs));
+          }
+          alert(t("backupRestoreSuccess") || "Khôi phục dữ liệu học tập thành công! Trang web sẽ tải lại.");
+          window.location.reload();
+        } else {
+          alert(t("backupRestoreInvalid") || "Tệp sao lưu không hợp lệ.");
+        }
+      } catch (err) {
+        alert(t("backupRestoreError") || "Có lỗi xảy ra khi đọc tệp sao lưu.");
+      }
+    };
+    reader.readAsText(file);
+  };
   
   // Mascot Speech Bubble and Mood Control
-  const [mascotText, setMascotText] = useState("Chào mừng bạn! Hôm nay hãy cùng luyện tập Tiếng Trung thật vui nhé! 🐃");
+  const [mascotText, setMascotText] = useState(() => (translations[localStorage.getItem("chinese_ui_lang") || "vi"]?.mascotWelcome) || "Chào mừng bạn! Hôm nay hãy cùng luyện tập Tiếng Trung thật vui nhé! 🐃");
   const [mascotExpression, setMascotExpression] = useState("neutral");
 
   // Help Modal state
@@ -82,6 +264,10 @@ export default function App() {
     localStorage.setItem("chinese_sound", soundOn);
   }, [soundOn]);
 
+  useEffect(() => {
+    setMascotText(t("mascotWelcome"));
+  }, [uiLang]);
+
   // Derived Level (100 XP per level)
   const currentLevel = Math.floor(xp / 100) + 1;
 
@@ -90,7 +276,7 @@ export default function App() {
   useEffect(() => {
     if (currentLevel > prevLevelRef.current) {
       playSound("success");
-      setMascotText(`Chúc mừng! Bạn đã tích lũy đủ XP và Tăng cấp lên Cấp độ ${currentLevel}! Cực kỳ xuất sắc! 🏆`);
+      setMascotText(t("mascotLevelUp").replace("{level}", currentLevel));
       setMascotExpression("excited");
     }
     prevLevelRef.current = currentLevel;
@@ -99,8 +285,8 @@ export default function App() {
   // Trigger speech updates on level selection
   useEffect(() => {
     const levelName = mode === "simplified" ? `HSK ${selectedLevel}` : `TOCFL ${selectedLevel}`;
-    triggerMascotReaction(`Bạn vừa chuyển sang chương trình học cấp độ ${levelName}. Hãy cùng chinh phục các thử thách nhé! 🐃`, "happy");
-  }, [selectedLevel, mode]);
+    triggerMascotReaction(t("mascotLevelChanged").replace("{levelName}", levelName), "happy");
+  }, [selectedLevel, mode, uiLang]);
 
   // Helper Web Audio API sound synthesizer
   const playSound = (type) => {
@@ -179,7 +365,8 @@ export default function App() {
     }, 100);
 
     playSound("correct");
-    triggerMascotReaction(`Bạn đã chọn chữ "${charObj.simplified || charObj.traditional}". Hãy cùng tập viết nét chuẩn nhé! 🐃`, "excited");
+    const activeChar = mode === "simplified" ? (charObj.simplified || charObj.traditional) : (charObj.traditional || charObj.simplified);
+    triggerMascotReaction(t("mascotJumpToWriting").replace("{char}", activeChar), "excited");
   };
 
   // Renders active skill panel
@@ -197,7 +384,15 @@ export default function App() {
             customWords={customWords}
             onAddCustomWord={handleAddCustomWord}
             onRemoveCustomWord={handleRemoveCustomWord}
+            onUpdateCustomWord={handleUpdateCustomWord}
             autoSelectWordId={jumpedWordId}
+            uiLang={uiLang}
+            t={t}
+            mastery={mastery.writing}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
           />
         );
       case "reading":
@@ -208,6 +403,13 @@ export default function App() {
             addXp={addXpPoints}
             triggerMascot={triggerMascotReaction}
             playSound={playSound}
+            uiLang={uiLang}
+            t={t}
+            mastery={mastery.reading}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
           />
         );
       case "listening":
@@ -220,6 +422,11 @@ export default function App() {
             playSound={playSound}
             uiLang={uiLang}
             t={t}
+            mastery={mastery.listening}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
           />
         );
       case "speaking":
@@ -230,6 +437,48 @@ export default function App() {
             addXp={addXpPoints}
             triggerMascot={triggerMascotReaction}
             playSound={playSound}
+            uiLang={uiLang}
+            t={t}
+            mastery={mastery.speaking}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
+          />
+        );
+      case "typing":
+        return (
+          <SkillTyping
+            mode={mode}
+            selectedLevel={selectedLevel}
+            addXp={addXpPoints}
+            triggerMascot={triggerMascotReaction}
+            playSound={playSound}
+            uiLang={uiLang}
+            t={t}
+            mastery={mastery.typing}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
+          />
+        );
+      case "flashcards":
+        return (
+          <SkillFlashcards
+            mode={mode}
+            selectedLevel={selectedLevel}
+            addXp={addXpPoints}
+            triggerMascot={triggerMascotReaction}
+            playSound={playSound}
+            uiLang={uiLang}
+            t={t}
+            mastery={mastery.flashcards || 1000}
+            updateMasteryScore={updateMasteryScore}
+            reviewLogs={reviewLogs}
+            addReviewLogs={addReviewLogs}
+            globalVocabularyPool={globalVocabularyPool}
+            customWords={customWords}
           />
         );
       default:
@@ -254,6 +503,8 @@ export default function App() {
         onOpenDict={() => setIsDictOpen(true)}
         uiLang={uiLang}
         setUiLang={setUiLang}
+        onExportProgress={handleExportProgress}
+        onImportProgress={handleImportProgress}
         t={t}
       />
 
@@ -290,6 +541,20 @@ export default function App() {
             >
               <span className="nav-icon">🗣️</span> {t("navSpeaking")}
             </button>
+
+            <button
+              className={`nav-card ${activeSkill === "typing" ? "active" : ""}`}
+              onClick={() => setActiveSkill("typing")}
+            >
+              <span className="nav-icon">⌨️</span> {t("navTyping")}
+            </button>
+
+            <button
+              className={`nav-card ${activeSkill === "flashcards" ? "active" : ""}`}
+              onClick={() => setActiveSkill("flashcards")}
+            >
+              <span className="nav-icon">🎴</span> {t("navFlashcards")}
+            </button>
           </aside>
 
           {/* Interactive Playground */}
@@ -306,6 +571,8 @@ export default function App() {
                     {activeSkill === "reading" && t("cardTitleReading")}
                     {activeSkill === "listening" && t("cardTitleListening")}
                     {activeSkill === "speaking" && t("cardTitleSpeaking")}
+                    {activeSkill === "typing" && t("cardTitleTyping")}
+                    {activeSkill === "flashcards" && t("cardTitleFlashcards")}
                   </h2>
                   <p className="card-subtitle">
                     {mode === "simplified" ? `${t("levelPrefix")} ${selectedLevel} · ${t("modeSimplified")}` : `${t("levelPrefix")} ${selectedLevel} · ${t("modeTraditional")}`}
@@ -351,6 +618,20 @@ export default function App() {
         >
           <span className="mobile-nav-icon">🗣️</span>
           <span className="mobile-nav-label">{t("navSpeaking")}</span>
+        </button>
+        <button
+          className={`mobile-nav-btn ${activeSkill === "typing" ? "active" : ""}`}
+          onClick={() => setActiveSkill("typing")}
+        >
+          <span className="mobile-nav-icon">⌨️</span>
+          <span className="mobile-nav-label">{t("navTyping")}</span>
+        </button>
+        <button
+          className={`mobile-nav-btn ${activeSkill === "flashcards" ? "active" : ""}`}
+          onClick={() => setActiveSkill("flashcards")}
+        >
+          <span className="mobile-nav-icon">🎴</span>
+          <span className="mobile-nav-label">{t("navFlashcards")}</span>
         </button>
       </nav>
 
@@ -399,21 +680,21 @@ export default function App() {
             </button>
 
             <h3 style={{ fontWeight: 800, fontSize: "1.4rem", display: "flex", alignItems: "center", gap: "10px", color: "hsl(var(--primary-teal-dark))", marginBottom: "20px" }}>
-              🎨 Hướng dẫn Học Tiếng Trung 4 Kỹ năng
+              {t("helpModalTitle")}
             </h3>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "15px", fontSize: "0.95rem", lineHeight: 1.6 }}>
               <div>
-                <strong style={{ color: "hsl(var(--primary-teal-dark))" }}>✍️ Viết chữ Hán:</strong> Chọn một chữ Hán, nhấn <strong>Xem nét</strong> để học thứ tự nét, hoặc <strong>Luyện viết</strong> để tự tay vẽ đè trên ô lưới đỏ. Máy sẽ tự sửa lỗi nét cho bạn!
+                <strong style={{ color: "hsl(var(--primary-teal-dark))" }}>✍️ {t("helpWritingTitle")}:</strong> {t("helpWritingDesc")}
               </div>
               <div>
-                <strong style={{ color: "hsl(var(--secondary-indigo))" }}>📖 Đọc hiểu:</strong> Bạn có thể bật/tắt phiên âm Pinyin. Nhấn vào bất kỳ từ nào để tra từ điển nhanh và nghe phát âm. Hoàn thành Quiz trắc nghiệm bên dưới để nhận XP.
+                <strong style={{ color: "hsl(var(--secondary-indigo))" }}>📖 {t("helpReadingTitle")}:</strong> {t("helpReadingDesc")}
               </div>
               <div>
-                <strong style={{ color: "hsl(var(--accent-orange))" }}>🎧 Luyện nghe:</strong> Nhấn nút loa chính hoặc nút rùa 🐢 để phát âm chậm rãi, sau đó chọn câu dịch nghĩa tương ứng.
+                <strong style={{ color: "hsl(var(--accent-orange))" }}>🎧 {t("helpListeningTitle")}:</strong> {t("helpListeningDesc")}
               </div>
               <div>
-                <strong style={{ color: "hsl(var(--secondary-indigo-dark))" }}>🗣️ Luyện phát âm:</strong> Nghe phát âm mẫu, sau đó nhấn giữ Micro để đọc to câu mẫu. Trình duyệt Chrome/Edge sẽ phân tích giọng đọc và cho bạn điểm số phần trăm chính xác!
+                <strong style={{ color: "hsl(var(--secondary-indigo-dark))" }}>🗣️ {t("helpSpeakingTitle")}:</strong> {t("helpSpeakingDesc")}
               </div>
             </div>
 
@@ -422,7 +703,7 @@ export default function App() {
               style={{ width: "100%", marginTop: "25px" }}
               onClick={() => setHelpOpen(false)}
             >
-              Bắt đầu học ngay!
+              {t("helpModalCta")}
             </button>
           </div>
         </div>
@@ -435,11 +716,14 @@ export default function App() {
         customWords={customWords}
         onJumpToWriting={handleJumpToWriting}
         mode={mode}
+        uiLang={uiLang}
+        t={t}
+        writingData={globalVocabularyPool}
       />
 
       {/* Footer */}
       <footer className="footer-credits">
-        Ứng dụng học tiếng Trung 4 kỹ năng · Thực hiện bởi <a href="https://github.com/Vincentius-Vu/Chinese_Learning" target="_blank" rel="noopener noreferrer"> Tri-Vien Vu + Antigravity</a>
+        {t("footerText")} <a href="https://github.com/Vincentius-Vu/Chinese_Learning/" target="_blank" rel="noopener noreferrer">Tri-Vien Vu + Antigravity</a>
       </footer>
     </div>
   );

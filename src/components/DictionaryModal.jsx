@@ -8,7 +8,10 @@ export default function DictionaryModal({
   onClose,
   customWords = [],
   onJumpToWriting,
-  mode
+  mode,
+  uiLang = "vi",
+  t,
+  writingData: propWritingData
 }) {
   const [dictSearchQuery, setDictSearchQuery] = useState("");
   const [selectedChar, setSelectedChar] = useState(null);
@@ -28,8 +31,9 @@ export default function DictionaryModal({
       }
     });
     
+    const vocabData = propWritingData || writingData;
     // Add default HSK 1-6 vocabulary
-    writingData.forEach(w => {
+    vocabData.forEach(w => {
       const char = mode === "simplified" ? w.simplified : w.traditional;
       if (!seen.has(char)) {
         seen.add(char);
@@ -38,7 +42,7 @@ export default function DictionaryModal({
     });
     
     return list;
-  }, [customWords, writingData, mode]);
+  }, [customWords, propWritingData, mode]);
 
   // Normalize search helper to strip tones and Vietnamese accents
   const normalizeStr = (str) => {
@@ -208,10 +212,10 @@ export default function DictionaryModal({
           <span style={{ fontSize: "1.6rem" }}>🔍</span>
           <div>
             <h2 style={{ margin: 0, fontSize: "1.3rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>
-              Từ điển Tra cứu Hán-Việt
+              {t("dictTitle")}
             </h2>
             <p style={{ margin: "2px 0 0", fontSize: "0.75rem", color: "hsl(var(--neutral-gray))", fontWeight: 600 }}>
-              Tìm kiếm nhanh theo chữ Hán, Pinyin, âm Hán-Việt hoặc nghĩa Tiếng Việt
+              {t("placeholderSearchDict")}
             </p>
           </div>
         </div>
@@ -224,7 +228,7 @@ export default function DictionaryModal({
             <div style={{ marginBottom: "15px", position: "relative" }}>
               <input
                 type="text"
-                placeholder="Tìm kiếm: wo, nga, toi, 你..."
+                placeholder={t("placeholderInputSearchDict")}
                 value={dictSearchQuery}
                 onChange={(e) => setDictSearchQuery(e.target.value)}
                 autoFocus
@@ -266,8 +270,8 @@ export default function DictionaryModal({
 
             {/* Results Title Count */}
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", fontSize: "0.75rem", color: "hsl(var(--neutral-gray))", fontWeight: 700 }}>
-              <span>{dictSearchQuery ? "Kết quả tìm kiếm" : "Gợi ý từ thông dụng"}</span>
-              <span>Đang hiển thị {filteredWords.length} chữ</span>
+              <span>{dictSearchQuery ? t("labelSearchResults") : t("labelSuggestedWords")}</span>
+              <span>{t("labelShowingWords").replace("{count}", filteredWords.length)}</span>
             </div>
 
             {/* Results Scrollable Area */}
@@ -275,8 +279,8 @@ export default function DictionaryModal({
               {filteredWords.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "40px 10px", color: "hsl(var(--neutral-gray))" }}>
                   <p style={{ fontSize: "2rem", margin: 0 }}>🐃</p>
-                  <p style={{ fontSize: "0.85rem", fontWeight: 700, marginTop: "8px" }}>Không tìm thấy chữ Hán nào phù hợp rồi bạn ơi!</p>
-                  <p style={{ fontSize: "0.75rem", margin: "4px 0 0" }}>Hãy thử nhập từ khóa tìm kiếm khác nhé.</p>
+                  <p style={{ fontSize: "0.85rem", fontWeight: 700, marginTop: "8px" }}>{t("labelNoWordsFound")}</p>
+                  <p style={{ fontSize: "0.75rem", margin: "4px 0 0" }}>{t("labelTryAnotherKeyword")}</p>
                 </div>
               ) : (
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "10px" }}>
@@ -356,7 +360,7 @@ export default function DictionaryModal({
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                         <h3 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 850 }}>
-                          {activeCharSinoViet || "Chưa có âm Hán-Việt"}
+                          {activeCharSinoViet || t("labelNoSinoViet")}
                         </h3>
                         <button
                           onClick={() => handleSpeak(activeChar)}
@@ -374,7 +378,7 @@ export default function DictionaryModal({
                             justifyContent: "center",
                             boxShadow: "0 2px 5px rgba(0,0,0,0.05)"
                           }}
-                          title="Nghe phát âm bản xứ"
+                          title={t("titleNativePronunciation")}
                         >
                           🔊
                         </button>
@@ -389,18 +393,18 @@ export default function DictionaryModal({
                           borderRadius: "20px",
                           border: "1px solid rgba(0,0,0,0.04)"
                         }}>
-                          {selectedChar.source === "custom" ? "Từ vựng tùy chỉnh" : `HSK / TOCFL Cấp ${selectedChar.level}`}
+                          {selectedChar.source === "custom" ? t("labelCustomWord") : `HSK / TOCFL ${t("levelPrefix")} ${selectedChar.level}`}
                         </span>
                       </div>
 
                       <div style={{ display: "flex", gap: "12px", marginTop: "8px", fontSize: "0.85rem" }}>
-                        <span>Pinyin: <strong style={{ color: "hsl(var(--accent-orange))", fontWeight: 800 }}>{selectedChar.pinyin}</strong></span>
+                        <span>{t("labelPinyin")}: <strong style={{ color: "hsl(var(--accent-orange))", fontWeight: 800 }}>{selectedChar.pinyin}</strong></span>
                         <span style={{ color: "rgba(0,0,0,0.15)" }}>|</span>
-                        <span>Ý nghĩa: <strong>{selectedChar.translation}</strong></span>
+                        <span>{t("labelMeaning")}: <strong>{selectedChar.translation}</strong></span>
                       </div>
 
                       <div style={{ fontSize: "0.75rem", color: "hsl(var(--neutral-gray))", fontWeight: 700, marginTop: "6px" }}>
-                        Nhóm: <span style={{ color: "hsl(var(--neutral-dark))" }}>{selectedChar.category || "Chưa phân nhóm"}</span>
+                        {t("labelCategory")}: <span style={{ color: "hsl(var(--neutral-dark))" }}>{selectedChar.category || t("labelUncategorized")}</span>
                       </div>
                     </div>
                   </div>
@@ -411,7 +415,7 @@ export default function DictionaryModal({
                   {activeCharRadicals && activeCharRadicals.length > 0 && (
                     <div style={{ marginBottom: "22px" }}>
                       <h4 style={{ margin: "0 0 8px", fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--neutral-dark))" }}>
-                        🧱 Cấu tạo bộ thủ chính:
+                        🧱 {t("etymologyDecomposition")}:
                       </h4>
                       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
                         {activeCharRadicals.map((rad) => (
@@ -431,7 +435,7 @@ export default function DictionaryModal({
                             <span style={{ fontSize: "1.4rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>{rad.symbol}</span>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                               <span style={{ fontSize: "0.75rem", fontWeight: 800 }}>{rad.sinoViet} ({rad.pinyin})</span>
-                              <span style={{ fontSize: "0.65rem", color: "hsl(var(--neutral-gray))", fontWeight: 600 }}>Bộ nghĩa: {rad.meaning}</span>
+                              <span style={{ fontSize: "0.65rem", color: "hsl(var(--neutral-gray))", fontWeight: 600 }}>{t("etymologyRadical")}: {rad.meaning}</span>
                             </div>
                           </div>
                         ))}
@@ -443,7 +447,7 @@ export default function DictionaryModal({
                   {activeCharEtymology && (
                     <div style={{ marginBottom: "22px" }}>
                       <h4 style={{ margin: "0 0 8px", fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--neutral-dark))" }}>
-                        🌱 Giải nghĩa nguồn gốc tự hình:
+                        🌱 {t("etymologyExplanation")}:
                       </h4>
                       <p style={{ margin: 0, fontSize: "0.8rem", color: "hsl(var(--neutral-dark))", lineHeight: "1.5", fontWeight: 500, background: "white", padding: "12px", borderRadius: "10px", border: "1px solid rgba(0,0,0,0.05)" }}>
                         {activeCharEtymology.description}
@@ -455,7 +459,7 @@ export default function DictionaryModal({
                   {activeCharEtymology && activeCharEtymology.story && (
                     <div style={{ marginBottom: "22px" }}>
                       <h4 style={{ margin: "0 0 8px", fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--neutral-dark))" }}>
-                        💡 Mẹo ghi nhớ dễ dàng:
+                        💡 {t("mnemonicTip")}:
                       </h4>
                       <div
                         style={{
@@ -479,7 +483,7 @@ export default function DictionaryModal({
                   {activeCharEtymology && activeCharEtymology.evolution && activeCharEtymology.evolution.length > 0 && (
                     <div style={{ marginBottom: "15px" }}>
                       <h4 style={{ margin: "0 0 10px", fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--neutral-dark))" }}>
-                        ⏳ Tiến hóa chữ viết cổ đại:
+                        ⏳ {t("evolutionAncientScripts")}:
                       </h4>
                       <div style={{
                         display: "flex",
@@ -537,10 +541,10 @@ export default function DictionaryModal({
                   {!activeCharEtymology && (
                     <div style={{ textAlign: "center", padding: "20px", color: "hsl(var(--neutral-gray))", background: "white", borderRadius: "10px", border: "1px dashed rgba(0,0,0,0.1)" }}>
                       <p style={{ margin: 0, fontSize: "0.85rem", fontWeight: 700 }}>
-                        {selectedChar.source === "custom" ? "Chữ Hán tự tùy chỉnh" : "Từ vựng học tập"}
+                        {selectedChar.source === "custom" ? t("labelCustomWord") : t("labelVocabStudy")}
                       </p>
                       <p style={{ margin: "4px 0 0", fontSize: "0.75rem" }}>
-                        Không có dữ liệu chi tiết nguồn gốc của chữ này. Bạn vẫn có thể xem bộ thủ, nghe phát âm và tập viết nét chuẩn bình thường.
+                        {t("labelNoEtymologyData")}
                       </p>
                     </div>
                   )}
@@ -566,15 +570,15 @@ export default function DictionaryModal({
                       borderRadius: "8px"
                     }}
                   >
-                    <span>✍️ Tập viết chữ này ngay</span>
+                    <span>✍️ {t("btnPracticeThisWord")}</span>
                   </button>
                 </div>
               </div>
             ) : (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "hsl(var(--neutral-gray))" }}>
                 <p style={{ fontSize: "2.5rem", margin: 0 }}>📚</p>
-                <p style={{ fontSize: "0.85rem", fontWeight: 700, marginTop: "10px" }}>Chọn một chữ Hán ở danh sách bên trái</p>
-                <p style={{ fontSize: "0.75rem", margin: "4px 0 0" }}>Để xem chi tiết âm Hán-Việt, phát âm và nguồn gốc tự hình.</p>
+                <p style={{ fontSize: "0.85rem", fontWeight: 700, marginTop: "10px" }}>{t("labelSelectWordFromList")}</p>
+                <p style={{ fontSize: "0.75rem", margin: "4px 0 0" }}>{t("labelSelectWordFromListDesc")}</p>
               </div>
             )}
           </div>
