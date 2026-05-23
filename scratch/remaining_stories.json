@@ -1,0 +1,128 @@
+[
+  {
+    "id": "r8",
+    "level": 4,
+    "title": "提高工作效率",
+    "translation": "Nâng cao hiệu quả công việc"
+  },
+  {
+    "id": "r9",
+    "level": 4,
+    "title": "难忘的旅行",
+    "translation": "Chuyến du lịch đáng nhớ"
+  },
+  {
+    "id": "r10",
+    "level": 4,
+    "title": "城市生活与环保",
+    "translation": "Cuộc sống đô thị và bảo vệ môi trường"
+  },
+  {
+    "id": "r18",
+    "level": 4,
+    "title": "面试与未来的工作",
+    "translation": "Phỏng vấn và công việc tương lai"
+  },
+  {
+    "id": "r32",
+    "level": 4,
+    "title": "保护环境与垃圾分类",
+    "translation": "Bảo vệ môi trường và phân loại rác"
+  },
+  {
+    "id": "r33",
+    "level": 4,
+    "title": "旅行的真正意义",
+    "translation": "Ý nghĩa thực sự của du lịch"
+  },
+  {
+    "id": "r34",
+    "level": 4,
+    "title": "如何缓解工作压力？",
+    "translation": "Làm thế nào để giảm bớt áp lực công việc?"
+  },
+  {
+    "id": "r11",
+    "level": 5,
+    "title": "讨论投资计划",
+    "translation": "Thảo luận kế hoạch đầu tư"
+  },
+  {
+    "id": "r12",
+    "level": 5,
+    "title": "面试与个人成就",
+    "translation": "Phỏng vấn và thành tích cá nhân"
+  },
+  {
+    "id": "r13",
+    "level": 5,
+    "title": "改进客户服务",
+    "translation": "Cải tiến dịch vụ khách hàng"
+  },
+  {
+    "id": "r35",
+    "level": 5,
+    "title": "商业谈判与合同签署",
+    "translation": "Đàm phán thương mại và ký kết hợp đồng"
+  },
+  {
+    "id": "r36",
+    "level": 5,
+    "title": "大学本科的价值与挑战",
+    "translation": "Giá trị và thử thách của đại học chính quy"
+  },
+  {
+    "id": "r37",
+    "level": 5,
+    "title": "网络技术对传统博物馆的影响",
+    "translation": "Ảnh hưởng của công nghệ mạng đối với bảo tàng truyền thống"
+  },
+  {
+    "id": "r38",
+    "level": 5,
+    "title": "职场沟通的艺术",
+    "translation": "Nghệ thuật giao tiếp công sở"
+  },
+  {
+    "id": "r14",
+    "level": 6,
+    "title": "企业战略决策",
+    "translation": "Quyết sách chiến lược doanh nghiệp"
+  },
+  {
+    "id": "r15",
+    "level": 6,
+    "title": "可持续发展与社会责任",
+    "translation": "Phát triển bền vững và trách nhiệm xã hội"
+  },
+  {
+    "id": "r16",
+    "level": 6,
+    "title": "金融管理与多方协调",
+    "translation": "Quản lý tài chính và phối hợp đa bên"
+  },
+  {
+    "id": "r39",
+    "level": 6,
+    "title": "全球化背景下的跨国企业战略",
+    "translation": "Chiến lược doanh nghiệp đa quốc gia trong bối cảnh toàn cầu hóa"
+  },
+  {
+    "id": "r40",
+    "level": 6,
+    "title": "生态文明与可持续发展的长远规划",
+    "translation": "Quy hoạch lâu dài của văn minh sinh thái và phát triển bền vững"
+  },
+  {
+    "id": "r41",
+    "level": 6,
+    "title": "老龄化社会与宏观经济结构调整",
+    "translation": "Xã hội già hóa và điều chỉnh cơ cấu kinh tế vĩ mô"
+  },
+  {
+    "id": "r42",
+    "level": 6,
+    "title": "科技创新与知识产权保护的博弈",
+    "translation": "Cuộc đấu trí giữa đổi mới khoa học công nghệ và bảo hộ quyền sở hữu trí tuệ"
+  }
+]
