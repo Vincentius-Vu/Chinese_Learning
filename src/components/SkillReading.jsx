@@ -75,28 +75,23 @@ export default function SkillReading({
   }, [selectedStoryId, mode]);
 
   // Handle character lookup clicks
-  const handleCharClick = (char) => {
-    // Search in story vocabulary dataset
-    const matched = activeStory.vocabulary.find(
-      (v) => v.simplified === char || v.traditional === char
-    );
-
-    if (matched) {
+  const handleWordClick = (token) => {
+    if (token.isVocab) {
       setSelectedWord({
-        hanzi: mode === "simplified" ? matched.simplified : matched.traditional,
-        pinyin: matched.pinyin,
-        meaning: matched.meaning
+        hanzi: token.text,
+        pinyin: token.pinyin,
+        meaning: token.meaning
       });
-      triggerMascot(t("mascotReadingWordMeaning").replace("{char}", char).replace("{meaning}", matched.meaning), "happy");
+      triggerMascot(t("mascotReadingWordMeaning").replace("{char}", token.text).replace("{meaning}", token.meaning), "happy");
       playSound("correct");
     } else {
       // Fallback lookup (create clean character item)
       setSelectedWord({
-        hanzi: char,
+        hanzi: token.text,
         pinyin: "-",
         meaning: t("labelVocabStudy")
       });
-      triggerMascot(t("mascotReadingWordDetail").replace("{char}", char), "thinking");
+      triggerMascot(t("mascotReadingWordDetail").replace("{char}", token.text), "thinking");
     }
   };
 
@@ -137,36 +132,62 @@ export default function SkillReading({
   // Parse narrative into interactive character spans
   const renderInteractiveText = (text) => {
     const lines = text.split("\n");
+    // Sort vocab by length descending to do greedy matching
+    const vocabList = [...activeStory.vocabulary].sort((a, b) => b.simplified.length - a.simplified.length);
+
     return lines.map((line, lineIdx) => {
-      // Match words in vocab list and group them, or just split character by character
-      const chars = Array.from(line);
+      let tokens = [];
+      let i = 0;
+      while (i < line.length) {
+        // Find longest matching vocab
+        let matched = null;
+        for (const v of vocabList) {
+          const wordText = mode === "simplified" ? v.simplified : v.traditional;
+          if (line.substring(i, i + wordText.length) === wordText) {
+            matched = v;
+            break;
+          }
+        }
+
+        if (matched) {
+          const wordText = mode === "simplified" ? matched.simplified : matched.traditional;
+          tokens.push({
+            text: wordText,
+            isVocab: true,
+            pinyin: matched.pinyin,
+            meaning: matched.meaning
+          });
+          i += wordText.length;
+        } else {
+          tokens.push({
+            text: line[i],
+            isVocab: false
+          });
+          i++;
+        }
+      }
+
       return (
         <div key={lineIdx} className="reading-paragraph">
-          {chars.map((char, charIdx) => {
-            const isPunctuation = /[，。！？：！？\s]/.test(char);
+          {tokens.map((token, tokenIdx) => {
+            const isPunctuation = /[，。！？：！？、\s]/.test(token.text);
             if (isPunctuation) {
               return (
-                <span key={charIdx} style={{ fontSize: "1.6rem", color: "hsl(var(--neutral-gray))", margin: "0 2px" }}>
-                  {char}
+                <span key={tokenIdx} style={{ fontSize: "1.6rem", color: "hsl(var(--neutral-gray))", margin: "0 2px" }}>
+                  {token.text}
                 </span>
               );
             }
 
-            // Find Pinyin transcription
-            const matchedVocab = activeStory.vocabulary.find(
-              (v) => v.simplified === char || v.traditional === char
-            );
-            const pinyinText = matchedVocab ? matchedVocab.pinyin : "";
-
             return (
               <div
-                key={charIdx}
+                key={tokenIdx}
                 className="reading-word-block"
-                onClick={() => handleCharClick(char)}
+                onClick={() => handleWordClick(token)}
               >
-                <span className="word-hanzi">{char}</span>
-                {showPinyin && pinyinText && (
-                  <span className="word-pinyin">{pinyinText}</span>
+                <span className="word-hanzi">{token.text}</span>
+                {showPinyin && token.isVocab && token.pinyin && (
+                  <span className="word-pinyin">{token.pinyin}</span>
                 )}
               </div>
             );
