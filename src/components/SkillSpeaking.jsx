@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { speakingData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
 import { speakText } from "../lib/tts";
+import { AudioRecorder } from "../lib/audioHelper";
 
 // ── Pinyin & Levenshtein Helper Functions for Homophone-Resistant Matching ──
 let charPinyinLookup = null;
@@ -103,8 +104,13 @@ export default function SkillSpeaking({
   const [correctCount, setCorrectCount] = useState(0); // Cumulative count of correct matches
   const [errorMsg, setErrorMsg] = useState("");
   const [hasMicSupport, setHasMicSupport] = useState(true);
-  const [speechRecognizer, setSpeechRecognizer] = useState(null);
   const [isVocabRoundFinished, setIsVocabRoundFinished] = useState(false);
+
+  // Whisper offline AI states
+  const [modelStatus, setModelStatus] = useState("idle"); // 'idle' | 'loading' | 'ready' | 'transcribing'
+  const [loadProgress, setLoadProgress] = useState(0);
+  const workerRef = useRef(null);
+  const recorderRef = useRef(null);
 
   // Generate exercises based on adaptive vocabulary (ZPD)
   const generateAdaptiveSpeakingExercises = () => {
@@ -152,51 +158,60 @@ export default function SkillSpeaking({
     setIsVocabRoundFinished(false);
   }, [selectedLevel, exerciseMode, mastery]);
 
-  // Initialize Speech Recognition
+  // Initialize Whisper Web Worker & AudioRecorder
   useEffect(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setHasMicSupport(false);
-    } else {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+    recorderRef.current = new AudioRecorder();
 
-      recognition.onstart = () => {
-        setIsRecording(true);
-        setTranscript("");
-        setScore(null);
-        setErrorMsg("");
-      };
+    // Check microphone availability to set correct support flag
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        stream.getTracks().forEach((track) => track.stop());
+        setHasMicSupport(true);
+      })
+      .catch((err) => {
+        console.warn("Microphone not available or permission denied:", err);
+        setHasMicSupport(false);
+      });
 
-      recognition.onend = () => {
-        setIsRecording(false);
-      };
+    // Load Whisper Web Worker (Vite's URL imports are standard and clean)
+    const worker = new Worker(new URL("../lib/whisper.worker.js", import.meta.url), { type: "module" });
+    workerRef.current = worker;
 
-      recognition.onerror = (event) => {
-        setIsRecording(false);
-        if (event.error === "not-allowed") {
-          setErrorMsg(t("errorMicDenied"));
-          triggerMascot(t("mascotSpeakingMicAlert"), "sad");
-        } else {
-          setErrorMsg(`Error: ${event.error}`);
+    worker.onmessage = (event) => {
+      const { status, data, text, error } = event.data;
+
+      if (status === "progress") {
+        if (data.status === "progress" && data.progress !== undefined) {
+          setModelStatus("loading");
+          setLoadProgress(Math.round(data.progress));
+        } else if (data.status === "ready") {
+          setModelStatus("ready");
         }
-      };
-
-      recognition.onresult = (event) => {
-        const spokenText = event.results[0][0].transcript;
-        setTranscript(spokenText);
-        gradeUserSpeech(spokenText);
-      };
-
-      setSpeechRecognizer(recognition);
-    }
+      } else if (status === "started") {
+        setModelStatus("transcribing");
+      } else if (status === "completed") {
+        setModelStatus("ready");
+        setIsRecording(false);
+        const transcribedText = text ? text.trim() : "";
+        setTranscript(transcribedText);
+        gradeUserSpeech(transcribedText);
+      } else if (status === "error") {
+        setModelStatus("ready");
+        setIsRecording(false);
+        setErrorMsg(`Lỗi AI Whisper: ${error}`);
+      }
+    };
 
     const mascotWelcomeText = exerciseMode === "vocab" 
       ? (t("labelVocabSpeakingWelcome") || "Luyện phát âm từ vựng chuẩn! Nhấn giữ nút Micro, lắng nghe âm mẫu, sau đó đọc to từ mục tiêu để nhận điểm nhé! 🎙️")
       : t("mascotSpeakingWelcome");
     triggerMascot(mascotWelcomeText, "neutral");
+
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
   }, [currentIndex, mode, exerciseMode]);
 
   // Clean active speech job on unmount
@@ -332,20 +347,33 @@ export default function SkillSpeaking({
   };
 
   // Trigger microphone recording
-  const handleToggleRecord = () => {
-    if (!hasMicSupport || !speechRecognizer) {
-      simulateSpeaking();
-      return;
-    }
-
+  const handleToggleRecord = async () => {
     if (isRecording) {
-      speechRecognizer.stop();
-    } else {
-      speechRecognizer.lang = mode === "simplified" ? "zh-CN" : "zh-TW";
+      setIsRecording(false);
+      setModelStatus("transcribing");
       try {
-        speechRecognizer.start();
+        const float32Array = await recorderRef.current.stop();
+        if (workerRef.current) {
+          workerRef.current.postMessage({
+            audio: float32Array,
+            language: "chinese"
+          });
+        }
       } catch (err) {
-        speechRecognizer.stop();
+        console.error("Ghi âm thất bại:", err);
+        setErrorMsg(`Lỗi thu âm: ${err.message}`);
+        setModelStatus("ready");
+      }
+    } else {
+      setErrorMsg("");
+      setTranscript("");
+      setScore(null);
+      try {
+        await recorderRef.current.start();
+        setIsRecording(true);
+      } catch (err) {
+        console.error("Không truy cập được Micro:", err);
+        setErrorMsg("Không truy cập được Micro. Vui lòng cấp quyền ghi âm.");
       }
     }
   };
@@ -438,6 +466,53 @@ export default function SkillSpeaking({
 
   return (
     <div className="speaking-layout">
+      {/* Whisper AI Model loading / processing indicator */}
+      {modelStatus === "loading" && (
+        <div className="glass-panel" style={{
+          padding: "15px 20px",
+          borderRadius: "14px",
+          background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(20, 184, 166, 0.05) 100%)",
+          border: "1px solid rgba(99, 102, 241, 0.2)",
+          marginBottom: "15px",
+          textAlign: "center",
+          boxShadow: "0 8px 32px 0 rgba(99, 102, 241, 0.1)"
+        }}>
+          <div style={{ display: "flex", justifySelf: "stretch", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--secondary-indigo-dark))", display: "flex", alignItems: "center", gap: "6px" }}>
+              🤖 Đang tải mô hình trí tuệ nhân tạo (AI Whisper Offline)...
+            </span>
+            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>
+              {loadProgress}%
+            </span>
+          </div>
+          <div style={{ width: "100%", height: "6px", background: "rgba(0,0,0,0.06)", borderRadius: "10px", overflow: "hidden" }}>
+            <div style={{ width: `${loadProgress}%`, height: "100%", background: "linear-gradient(90deg, hsl(var(--secondary-indigo)) 0%, hsl(var(--primary-teal)) 100%)", transition: "width 0.3s ease" }} />
+          </div>
+          <p style={{ margin: "6px 0 0", fontSize: "0.7rem", color: "hsl(var(--neutral-gray))", fontStyle: "italic", fontWeight: 650 }}>
+            * Tải mô hình ~75MB. Các bài học tiếp theo sẽ hoạt động NGOẠI TUYẾN 100% không cần internet.
+          </p>
+        </div>
+      )}
+
+      {modelStatus === "transcribing" && (
+        <div className="glass-panel" style={{
+          padding: "15px 20px",
+          borderRadius: "14px",
+          background: "linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(99, 102, 241, 0.05) 100%)",
+          border: "1px solid rgba(20, 184, 166, 0.25)",
+          marginBottom: "15px",
+          textAlign: "center",
+          boxShadow: "0 8px 32px 0 rgba(20, 184, 166, 0.1)",
+          animation: "pulse 2s infinite ease-in-out"
+        }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+            <span style={{ fontSize: "1.4rem", animation: "spin 1s infinite linear", display: "inline-block" }}>🌀</span>
+            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>
+              Trí tuệ nhân tạo (AI Whisper) đang phân tích giọng đọc ngoại tuyến...
+            </span>
+          </div>
+        </div>
+      )}
       {/* Mode Selector Tabs */}
       <div className="speaking-mode-selector">
         <button
@@ -540,11 +615,12 @@ export default function SkillSpeaking({
       <div className="mic-wrapper" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <button
-            className={`mic-btn ${isRecording ? "recording" : ""}`}
+            className={`mic-btn ${isRecording ? "recording" : ""} ${modelStatus === "loading" || modelStatus === "transcribing" ? "btn-disabled" : ""}`}
             onClick={handleToggleRecord}
+            disabled={modelStatus === "loading" || modelStatus === "transcribing"}
             title={isRecording ? t("titleStopRecording") : t("titleStartRecording")}
           >
-            {isRecording ? "🛑" : "🎙️"}
+            {modelStatus === "transcribing" ? "🌀" : isRecording ? "🛑" : "🎙️"}
           </button>
           
           {!isRecording && (
