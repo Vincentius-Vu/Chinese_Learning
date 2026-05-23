@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { speakingData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
 import { speakText } from "../lib/tts";
-import { AudioRecorder } from "../lib/audioHelper";
-import WhisperWorker from "../lib/whisper.worker.js?worker";
 
 // ── Pinyin & Levenshtein Helper Functions for Homophone-Resistant Matching ──
 let charPinyinLookup = null;
@@ -107,11 +105,10 @@ export default function SkillSpeaking({
   const [hasMicSupport, setHasMicSupport] = useState(true);
   const [isVocabRoundFinished, setIsVocabRoundFinished] = useState(false);
 
-  // Whisper offline AI states
-  const [modelStatus, setModelStatus] = useState("idle"); // 'idle' | 'loading' | 'ready' | 'transcribing'
-  const [loadProgress, setLoadProgress] = useState(0);
-  const workerRef = useRef(null);
-  const recorderRef = useRef(null);
+  // Web Speech API states
+  const [recognition, setRecognition] = useState(null);
+  const recognitionRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   // Generate exercises based on adaptive vocabulary (ZPD)
   const generateAdaptiveSpeakingExercises = () => {
@@ -159,78 +156,45 @@ export default function SkillSpeaking({
     setIsVocabRoundFinished(false);
   }, [selectedLevel, exerciseMode, mastery]);
 
-  // Initialize Whisper Web Worker & AudioRecorder
+  // Initialize Native Web Speech API
   useEffect(() => {
-    recorderRef.current = new AudioRecorder();
-
-    // Check microphone availability to set correct support flag
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then((stream) => {
-        stream.getTracks().forEach((track) => track.stop());
-        setHasMicSupport(true);
-      })
-      .catch((err) => {
-        console.warn("Microphone not available or permission denied:", err);
-        setHasMicSupport(false);
-      });
-
-    // Load Whisper Web Worker via Vite's robust worker bundler query
-    const worker = new WhisperWorker();
-    workerRef.current = worker;
-
-    worker.onmessage = (event) => {
-      const { status, data, text, error } = event.data;
-
-      if (status === "progress") {
-        if (data.status === "progress" && data.progress !== undefined) {
-          setModelStatus("loading");
-          setLoadProgress(Math.round(data.progress));
-        } else if (data.status === "ready") {
-          setModelStatus("ready");
-        }
-      } else if (status === "started") {
-        setModelStatus("transcribing");
-      } else if (status === "completed") {
-        setModelStatus("ready");
-        setIsRecording(false);
-        const transcribedText = text ? text.trim() : "";
-        setTranscript(transcribedText);
-        gradeUserSpeech(transcribedText);
-      } else if (status === "error") {
-        setModelStatus("ready");
-        setIsRecording(false);
-        setErrorMsg(`Lỗi AI Whisper: ${error}`);
-        
-        // Auto-clear corrupted browser cache storage in the background to self-heal
-        try {
-          if (typeof caches !== "undefined") {
-            caches.keys().then((keys) => {
-              keys.forEach((key) => {
-                if (key.includes("transformer")) {
-                  caches.delete(key).then(() => {
-                    console.log("Automatically cleared outdated/corrupted AI cache:", key);
-                  });
-                }
-              });
-            });
-          }
-        } catch (e) {
-          console.warn("Failed to auto-clear CacheStorage", e);
-        }
-      }
-    };
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (SpeechRecognitionAPI) {
+      const rec = new SpeechRecognitionAPI();
+      rec.continuous = false;
+      rec.interimResults = false;
+      
+      // Auto-adapt language
+      rec.lang = mode === "simplified" ? "zh-CN" : "zh-TW";
+      
+      recognitionRef.current = rec;
+      setRecognition(rec);
+      setHasMicSupport(true);
+    } else {
+      console.warn("Speech Recognition API not supported in this browser.");
+      setHasMicSupport(false);
+    }
 
     const mascotWelcomeText = exerciseMode === "vocab" 
-      ? (t("labelVocabSpeakingWelcome") || "Luyện phát âm từ vựng chuẩn! Nhấn giữ nút Micro, lắng nghe âm mẫu, sau đó đọc to từ mục tiêu để nhận điểm nhé! 🎙️")
+      ? (t("labelVocabSpeakingWelcome") || "Luyện phát âm từ vựng chuẩn! Nhấn nút Micro, lắng nghe âm mẫu, sau đó đọc to từ nhé! 🎙️")
       : t("mascotSpeakingWelcome");
     triggerMascot(mascotWelcomeText, "neutral");
 
     return () => {
-      if (workerRef.current) {
-        workerRef.current.terminate();
+      if (recognitionRef.current) {
+        try { recognitionRef.current.abort(); } catch(e) {}
       }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [currentIndex, mode, exerciseMode]);
+
+  // Handle dynamic language updates
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = mode === "simplified" ? "zh-CN" : "zh-TW";
+    }
+  }, [mode]);
 
   // Clean active speech job on unmount
   useEffect(() => {
@@ -364,35 +328,104 @@ export default function SkillSpeaking({
     triggerMascot(t("mascotSpeakingModelDemo"), "thinking");
   };
 
-  // Trigger microphone recording
-  const handleToggleRecord = async () => {
-    if (isRecording) {
-      setIsRecording(false);
-      setModelStatus("transcribing");
-      try {
-        const float32Array = await recorderRef.current.stop();
-        if (workerRef.current) {
-          workerRef.current.postMessage({
-            audio: float32Array,
-            language: "chinese"
-          });
+  // Trigger Native Web Speech API with retry mechanism
+  const startRecognition = (retryCount = 0) => {
+    if (!recognitionRef.current) return;
+    const rec = recognitionRef.current;
+    
+    rec.onstart = () => {
+      setIsRecording(true);
+      setErrorMsg("");
+      triggerMascot("Đang lắng nghe... Hãy nói đi! 🎙️", "thinking");
+      
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        if (isRecording) {
+          rec.abort();
+          setIsRecording(false);
+          setErrorMsg("Hết thời gian chờ. Google/Siri không phản hồi, mạng có thể bị gián đoạn.");
+          playSound("wrong");
+          triggerMascot("Không nghe rõ, hãy bấm thử lại nhé!", "sad");
         }
-      } catch (err) {
-        console.error("Ghi âm thất bại:", err);
-        setErrorMsg(`Lỗi thu âm: ${err.message}`);
-        setModelStatus("ready");
+      }, 7000);
+    };
+    
+    rec.onresult = (event) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setIsRecording(false);
+      
+      let finalTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
       }
+      
+      if (finalTranscript) {
+        const text = finalTranscript.trim();
+        setTranscript(text);
+        gradeUserSpeech(text);
+      } else {
+        setErrorMsg("Không nhận diện được giọng nói. Hãy thử lại.");
+      }
+    };
+    
+    rec.onerror = (event) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      
+      // Auto-retry for network errors
+      if (event.error === 'network' && retryCount < 1) {
+        console.warn("Network error encountered. Retrying SpeechRecognition...");
+        triggerMascot("Mạng chập chờn, đang kết nối lại...", "thinking");
+        setTimeout(() => startRecognition(retryCount + 1), 1000);
+        return;
+      }
+      
+      setIsRecording(false);
+      
+      if (event.error === 'no-speech') {
+        setErrorMsg("Không phát hiện âm thanh. Bạn hãy nói to và rõ hơn.");
+        triggerMascot("Bạn chưa nói gì cả? 🤫", "neutral");
+      } else if (event.error === 'audio-capture') {
+        setErrorMsg("Lỗi micro. Đảm bảo micro đã được cắm và cho phép quyền truy cập.");
+      } else if (event.error === 'not-allowed') {
+        setErrorMsg("Bạn đã chặn quyền truy cập Micro. Vui lòng cấp quyền trong cài đặt trình duyệt.");
+      } else if (event.error === 'network') {
+        setErrorMsg("Lỗi mạng: Không kết nối được Google Speech/Siri. Hãy tắt VPN hoặc Adblock.");
+      } else if (event.error !== 'aborted') {
+        setErrorMsg(`Lỗi nhận diện: ${event.error}`);
+      }
+    };
+
+    rec.onend = () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setIsRecording(false);
+    };
+
+    try {
+      rec.start();
+    } catch (e) {
+      rec.abort();
+      setTimeout(() => { try { rec.start(); } catch(err) {} }, 100);
+    }
+  };
+
+  const handleToggleRecord = () => {
+    if (isRecording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     } else {
+      if (!recognition) {
+        setErrorMsg("Trình duyệt của bạn không hỗ trợ nhận diện giọng nói bản địa.");
+        return;
+      }
       setErrorMsg("");
       setTranscript("");
       setScore(null);
-      try {
-        await recorderRef.current.start();
-        setIsRecording(true);
-      } catch (err) {
-        console.error("Không truy cập được Micro:", err);
-        setErrorMsg("Không truy cập được Micro. Vui lòng cấp quyền ghi âm.");
-      }
+      startRecognition();
     }
   };
 
@@ -484,53 +517,6 @@ export default function SkillSpeaking({
 
   return (
     <div className="speaking-layout">
-      {/* Whisper AI Model loading / processing indicator */}
-      {modelStatus === "loading" && (
-        <div className="glass-panel" style={{
-          padding: "15px 20px",
-          borderRadius: "14px",
-          background: "linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(20, 184, 166, 0.05) 100%)",
-          border: "1px solid rgba(99, 102, 241, 0.2)",
-          marginBottom: "15px",
-          textAlign: "center",
-          boxShadow: "0 8px 32px 0 rgba(99, 102, 241, 0.1)"
-        }}>
-          <div style={{ display: "flex", justifySelf: "stretch", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--secondary-indigo-dark))", display: "flex", alignItems: "center", gap: "6px" }}>
-              🤖 Đang tải mô hình trí tuệ nhân tạo (AI Whisper Offline)...
-            </span>
-            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>
-              {loadProgress}%
-            </span>
-          </div>
-          <div style={{ width: "100%", height: "6px", background: "rgba(0,0,0,0.06)", borderRadius: "10px", overflow: "hidden" }}>
-            <div style={{ width: `${loadProgress}%`, height: "100%", background: "linear-gradient(90deg, hsl(var(--secondary-indigo)) 0%, hsl(var(--primary-teal)) 100%)", transition: "width 0.3s ease" }} />
-          </div>
-          <p style={{ margin: "6px 0 0", fontSize: "0.7rem", color: "hsl(var(--neutral-gray))", fontStyle: "italic", fontWeight: 650 }}>
-            * Tải mô hình ~75MB. Các bài học tiếp theo sẽ hoạt động NGOẠI TUYẾN 100% không cần internet.
-          </p>
-        </div>
-      )}
-
-      {modelStatus === "transcribing" && (
-        <div className="glass-panel" style={{
-          padding: "15px 20px",
-          borderRadius: "14px",
-          background: "linear-gradient(135deg, rgba(20, 184, 166, 0.08) 0%, rgba(99, 102, 241, 0.05) 100%)",
-          border: "1px solid rgba(20, 184, 166, 0.25)",
-          marginBottom: "15px",
-          textAlign: "center",
-          boxShadow: "0 8px 32px 0 rgba(20, 184, 166, 0.1)",
-          animation: "pulse 2s infinite ease-in-out"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-            <span style={{ fontSize: "1.4rem", animation: "spin 1s infinite linear", display: "inline-block" }}>🌀</span>
-            <span style={{ fontSize: "0.85rem", fontWeight: 800, color: "hsl(var(--primary-teal-dark))" }}>
-              Trí tuệ nhân tạo (AI Whisper) đang phân tích giọng đọc ngoại tuyến...
-            </span>
-          </div>
-        </div>
-      )}
       {/* Mode Selector Tabs */}
       <div className="speaking-mode-selector">
         <button
@@ -633,12 +619,11 @@ export default function SkillSpeaking({
       <div className="mic-wrapper" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <button
-            className={`mic-btn ${isRecording ? "recording" : ""} ${modelStatus === "loading" || modelStatus === "transcribing" ? "btn-disabled" : ""}`}
+            className={`mic-btn ${isRecording ? "recording" : ""}`}
             onClick={handleToggleRecord}
-            disabled={modelStatus === "loading" || modelStatus === "transcribing"}
             title={isRecording ? t("titleStopRecording") : t("titleStartRecording")}
           >
-            {modelStatus === "transcribing" ? "🌀" : isRecording ? "🛑" : "🎙️"}
+            {isRecording ? "🛑" : "🎙️"}
           </button>
           
           {!isRecording && (
@@ -700,37 +685,9 @@ export default function SkillSpeaking({
       {errorMsg && (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "15px" }}>
           <div style={{ color: "hsl(var(--danger-red))", fontWeight: 700, fontSize: "0.85rem", textAlign: "center", maxWidth: "450px", lineHeight: "1.4" }}>
-            ⚠️ {errorMsg.includes("network") 
-              ? "Lỗi mạng: Không kết nối được dịch vụ nhận dạng của Google. Vui lòng kiểm tra kết nối mạng."
-              : errorMsg.includes("session") || errorMsg.includes("Whisper")
-              ? "Lỗi bộ nhớ đệm AI (Corrupted Cache): Trình duyệt đang lưu bản nén lượng tử hóa bị lỗi cũ."
-              : errorMsg}
+            ⚠️ {errorMsg}
           </div>
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                if (typeof caches !== "undefined") {
-                  caches.keys().then((keys) => {
-                    Promise.all(keys.map(key => {
-                      if (key.includes("transformer")) {
-                        return caches.delete(key);
-                      }
-                      return Promise.resolve();
-                    })).then(() => {
-                      window.location.reload();
-                    });
-                  }).catch(() => {
-                    window.location.reload();
-                  });
-                } else {
-                  window.location.reload();
-                }
-              }}
-              style={{ padding: "8px 16px", fontSize: "0.75rem", borderRadius: "8px", background: "hsl(var(--secondary-indigo))", color: "white" }}
-            >
-              🔄 Sửa lỗi tự động (Dọn dẹp & Thử lại)
-            </button>
             <button
               className="btn btn-secondary"
               onClick={simulateSpeaking}
