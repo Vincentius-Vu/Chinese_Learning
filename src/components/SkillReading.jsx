@@ -274,16 +274,22 @@ export default function SkillReading({
           {/* Cover illustration banner header */}
           <div className="reading-cover-banner">
             <ZenWatercolorCover 
+              key={`canvas-${activeStory.id}`}
               storyId={activeStory.id} 
               title={activeStory.titleSimplified} 
               level={activeStory.level}
             />
             {hasCoverImage ? (
               <img 
+                key={`img-${activeStory.id}`}
                 src={getStoryCoverPath(activeStory.id)}
                 alt={storyTitle}
                 className="reading-cover-image"
                 style={{ transition: "opacity 0.5s ease" }}
+                onLoad={(e) => {
+                  e.target.style.opacity = 1;
+                  e.target.style.pointerEvents = 'auto';
+                }}
                 onError={(e) => {
                   e.target.style.opacity = 0;
                   e.target.style.pointerEvents = 'none';
