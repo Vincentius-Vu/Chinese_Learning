@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { speakingData } from "../data/vocabulary";
+import { speakingData } from "../data/speakingData";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
 import { speakText } from "../lib/tts";
 

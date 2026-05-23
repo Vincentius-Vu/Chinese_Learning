@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { readingData } from "../data/vocabulary";
+import { readingData } from "../data/readingData";
 import ZenWatercolorCover from "./ZenWatercolorCover";
 import { speakText } from "../lib/tts";
 
