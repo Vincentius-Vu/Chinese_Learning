@@ -154,11 +154,6 @@ export default function SkillSpeaking({
 
   // Initialize Speech Recognition
   useEffect(() => {
-    const isNative = typeof window !== "undefined" && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-    if (isNative) {
-      setHasMicSupport(true);
-      return;
-    }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setHasMicSupport(false);

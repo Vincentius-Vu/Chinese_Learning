@@ -47,19 +47,13 @@ export default function SkillReading({
       return `/images/stories/${storyId}.webp`;
     }
 
-    // 2. If running in production mode (npm run build)
-    const isNative = typeof window !== "undefined" && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
-    if (isNative) {
-      return `./images/stories/${storyId}.webp`;
-    } else {
-      // For production web (GitHub Pages), resolve subfolder dynamically based on current URL path
-      const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
-      const pathSegments = pathname.split("/").filter(Boolean);
-      // Check if there is a repository subfolder in the URL path (e.g. /Chinese_Learning/)
-      const hasSubfolder = pathSegments.length > 0 && !pathname.endsWith(".html") && !pathname.endsWith(".js") && !pathname.endsWith(".css");
-      const base = hasSubfolder ? `/${pathSegments[0]}/` : "/";
-      return `${base}images/stories/${storyId}.webp`;
-    }
+    // 2. For production web (GitHub Pages), resolve subfolder dynamically based on current URL path
+    const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
+    const pathSegments = pathname.split("/").filter(Boolean);
+    // Check if there is a repository subfolder in the URL path (e.g. /Chinese_Learning/)
+    const hasSubfolder = pathSegments.length > 0 && !pathname.endsWith(".html") && !pathname.endsWith(".js") && !pathname.endsWith(".css");
+    const base = hasSubfolder ? `/${pathSegments[0]}/` : "/";
+    return `${base}images/stories/${storyId}.webp`;
   };
 
   const getGenerativeGradient = (storyId) => {
