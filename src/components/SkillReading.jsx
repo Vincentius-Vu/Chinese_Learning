@@ -40,6 +40,17 @@ export default function SkillReading({
   ];
   const hasCoverImage = storiesWithCovers.includes(activeStory.id);
 
+  const getStoryCoverPath = (storyId) => {
+    const isNative = typeof window !== "undefined" && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+    if (isNative) {
+      return `./images/stories/${storyId}.webp`;
+    } else {
+      const baseUrl = import.meta.env.BASE_URL || "/";
+      const cleanBase = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+      return `${cleanBase}images/stories/${storyId}.webp`;
+    }
+  };
+
   const getGenerativeGradient = (storyId) => {
     let hash = 0;
     for (let i = 0; i < storyId.length; i++) {
@@ -259,7 +270,7 @@ export default function SkillReading({
             />
             {hasCoverImage ? (
               <img 
-                src={`./images/stories/${activeStory.id}.webp`}
+                src={getStoryCoverPath(activeStory.id)}
                 alt={storyTitle}
                 className="reading-cover-image"
                 style={{ transition: "opacity 0.5s ease" }}
