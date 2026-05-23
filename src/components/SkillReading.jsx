@@ -41,13 +41,23 @@ export default function SkillReading({
   const hasCoverImage = storiesWithCovers.includes(activeStory.id);
 
   const getStoryCoverPath = (storyId) => {
+    // 1. If running in local development mode (npm run dev), always use clean absolute root path
+    if (import.meta.env.DEV) {
+      return `/images/stories/${storyId}.webp`;
+    }
+
+    // 2. If running in production mode (npm run build)
     const isNative = typeof window !== "undefined" && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
     if (isNative) {
       return `./images/stories/${storyId}.webp`;
     } else {
-      const baseUrl = import.meta.env.BASE_URL || "/";
-      const cleanBase = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
-      return `${cleanBase}images/stories/${storyId}.webp`;
+      // For production web (GitHub Pages), resolve subfolder dynamically based on current URL path
+      const pathname = typeof window !== "undefined" ? window.location.pathname : "/";
+      const pathSegments = pathname.split("/").filter(Boolean);
+      // Check if there is a repository subfolder in the URL path (e.g. /Chinese_Learning/)
+      const hasSubfolder = pathSegments.length > 0 && !pathname.endsWith(".html") && !pathname.endsWith(".js") && !pathname.endsWith(".css");
+      const base = hasSubfolder ? `/${pathSegments[0]}/` : "/";
+      return `${base}images/stories/${storyId}.webp`;
     }
   };
 
