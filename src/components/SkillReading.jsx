@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { readingData } from "../data/vocabulary";
+import ZenWatercolorCover from "./ZenWatercolorCover";
 
 export default function SkillReading({
   mode,
@@ -31,9 +32,11 @@ export default function SkillReading({
   const storyContent = mode === "simplified" ? activeStory.contentSimplified : activeStory.contentTraditional;
 
   const storiesWithCovers = [
-    "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r19", "r20", "r21", "r22", "r23",
-    "r24", "r25", "r26", "r27", "r28", "r17", "r29", "r30", "r31",
-    "r8", "r9", "r10", "r11", "r18", "r32", "r33", "r34"
+    "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10",
+    "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20",
+    "r21", "r22", "r23", "r24", "r25", "r26", "r27", "r28", "r29", "r30",
+    "r31", "r32", "r33", "r34", "r35", "r36", "r37", "r38", "r39", "r40",
+    "r41", "r42"
   ];
   const hasCoverImage = storiesWithCovers.includes(activeStory.id);
 
@@ -249,27 +252,23 @@ export default function SkillReading({
 
           {/* Cover illustration banner header */}
           <div className="reading-cover-banner">
+            <ZenWatercolorCover 
+              storyId={activeStory.id} 
+              title={activeStory.titleSimplified} 
+              level={activeStory.level}
+            />
             {hasCoverImage ? (
               <img 
                 src={`./images/stories/${activeStory.id}.webp`}
                 alt={storyTitle}
                 className="reading-cover-image"
+                style={{ transition: "opacity 0.5s ease" }}
                 onError={(e) => {
-                  e.target.style.display = 'none';
-                  const fallback = e.target.nextSibling;
-                  if (fallback) fallback.style.display = 'flex';
+                  e.target.style.opacity = 0;
+                  e.target.style.pointerEvents = 'none';
                 }}
               />
             ) : null}
-            <div 
-              className="reading-cover-fallback"
-              style={{ 
-                display: hasCoverImage ? 'none' : 'flex',
-                background: getGenerativeGradient(activeStory.id)
-              }}
-            >
-              <div className="cover-decorative-pattern">📖</div>
-            </div>
           </div>
 
           {/* Beautiful Story Title Header Card below the cover image */}
