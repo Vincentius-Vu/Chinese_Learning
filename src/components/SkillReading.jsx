@@ -247,7 +247,7 @@ export default function SkillReading({
           <div className="reading-cover-banner">
             {hasCoverImage ? (
               <img 
-                src={`/images/stories/${activeStory.id}.webp`}
+                src={`./images/stories/${activeStory.id}.webp`}
                 alt={storyTitle}
                 className="reading-cover-image"
                 onError={(e) => {
