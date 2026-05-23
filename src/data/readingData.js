@@ -2665,18 +2665,18 @@ export const readingData = [
       {
         question: "B có anh trai không?",
         options: [
-          { text: "Có, B có một anh trai", isCorrect: False },
-          { text: "Không, B chỉ có một em gái", isCorrect: True },
-          { text: "Không, B có một chị gái", isCorrect: False }
+          { text: "Có, B có một anh trai", isCorrect: false },
+          { text: "Không, B chỉ có một em gái", isCorrect: true },
+          { text: "Không, B có một chị gái", isCorrect: false }
         ],
         explanation: "Trong bài, B nói '我没有哥哥，我有一个妹妹' (Tôi không có anh trai, tôi có một em gái)."
       },
       {
         question: "Em gái của B năm nay bao nhiêu tuổi?",
         options: [
-          { text: "Tám tuổi (8)", isCorrect: True },
-          { text: "Chín tuổi (9)", isCorrect: False },
-          { text: "Mười tuổi (10)", isCorrect: False }
+          { text: "Tám tuổi (8)", isCorrect: true },
+          { text: "Chín tuổi (9)", isCorrect: false },
+          { text: "Mười tuổi (10)", isCorrect: false }
         ],
         explanation: "B nói '她今年八岁' (Em ấy năm nay tám tuổi - 八岁)."
       }
@@ -2704,18 +2704,18 @@ export const readingData = [
       {
         question: "Giá táo cuối cùng A mua là bao nhiêu?",
         options: [
-          { text: "10 tệ một quả", isCorrect: False },
-          { text: "8 tệ một quả", isCorrect: True },
-          { text: "5 tệ một quả", isCorrect: False }
+          { text: "10 tệ một quả", isCorrect: false },
+          { text: "8 tệ một quả", isCorrect: true },
+          { text: "5 tệ một quả", isCorrect: false }
         ],
         explanation: "A mặc cả '八块钱可以吗？' (8 tệ được không?) và ông chủ đồng ý '好吧' (Được thôi)."
       },
       {
         question: "Tổng số tiền A phải trả là bao nhiêu?",
         options: [
-          { text: "40 tệ", isCorrect: False },
-          { text: "60 tệ", isCorrect: True },
-          { text: "80 tệ", isCorrect: False }
+          { text: "40 tệ", isCorrect: false },
+          { text: "60 tệ", isCorrect: true },
+          { text: "80 tệ", isCorrect: false }
         ],
         explanation: "Táo 40 tệ, trà 20 tệ, tổng cộng là 60 tệ (一共六十块)."
       }
@@ -2743,9 +2743,9 @@ export const readingData = [
       {
         question: "A đã gọi những món gì?",
         options: [
-          { text: "Cá, 2 bát cơm trắng và 1 cốc nước", isCorrect: True },
-          { text: "Cá, 1 bát cơm trắng và trà", isCorrect: False },
-          { text: "Thịt bò, cơm trắng và nước ép", isCorrect: False }
+          { text: "Cá, 2 bát cơm trắng và 1 cốc nước", isCorrect: true },
+          { text: "Cá, 1 bát cơm trắng và trà", isCorrect: false },
+          { text: "Thịt bò, cơm trắng và nước ép", isCorrect: false }
         ],
         explanation: "A nói '我要一个鱼，两碗米饭。再来一杯水' (Tôi lấy một phần cá, hai bát cơm trắng. Thêm một cốc nước)."
       }
@@ -2774,18 +2774,18 @@ export const readingData = [
       {
         question: "Thời tiết hôm nay thế nào?",
         options: [
-          { text: "Trời mưa và lạnh", isCorrect: False },
-          { text: "Thời tiết đẹp, không mưa và rất nóng", isCorrect: True },
-          { text: "Trời có tuyết", isCorrect: False }
+          { text: "Trời mưa và lạnh", isCorrect: false },
+          { text: "Thời tiết đẹp, không mưa và rất nóng", isCorrect: true },
+          { text: "Trời có tuyết", isCorrect: false }
         ],
         explanation: "B nói '今天天气很好，不下雨。很热' (Hôm nay thời tiết rất đẹp, không mưa. Rất nóng)."
       },
       {
         question: "Tại sao A không đi xem phim được?",
         options: [
-          { text: "Vì A phải đi làm", isCorrect: False },
-          { text: "Vì A phải đến bệnh viện gặp bác sĩ", isCorrect: True },
-          { text: "Vì A phải ở nhà học bài", isCorrect: False }
+          { text: "Vì A phải đi làm", isCorrect: false },
+          { text: "Vì A phải đến bệnh viện gặp bác sĩ", isCorrect: true },
+          { text: "Vì A phải ở nhà học bài", isCorrect: false }
         ],
         explanation: "A nói '我下午要去医院看医生' (Chiều nay tôi phải đến bệnh viện gặp bác sĩ)."
       }
@@ -2813,9 +2813,9 @@ export const readingData = [
       {
         question: "Tại sao David hôm nay không đến trường?",
         options: [
-          { text: "Vì David phải đi mua đồ", isCorrect: False },
-          { text: "Vì David đi du lịch", isCorrect: False },
-          { text: "Vì David bị ốm", isCorrect: True }
+          { text: "Vì David phải đi mua đồ", isCorrect: false },
+          { text: "Vì David đi du lịch", isCorrect: false },
+          { text: "Vì David bị ốm", isCorrect: true }
         ],
         explanation: "David nói '我今天生病了，不能去学校' (Hôm nay em bị ốm, không thể đến trường được)."
       }
