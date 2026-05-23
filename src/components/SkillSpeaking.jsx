@@ -355,6 +355,7 @@ export default function SkillSpeaking({
     setIsRecording(true);
     setTranscript("");
     setScore(null);
+    setErrorMsg("");
     triggerMascot(t("mascotSpeakingRecording"), "thinking");
 
     setTimeout(() => {
@@ -536,14 +537,41 @@ export default function SkillSpeaking({
       </div>
 
       {/* Record button */}
-      <div className="mic-wrapper">
-        <button
-          className={`mic-btn ${isRecording ? "recording" : ""}`}
-          onClick={handleToggleRecord}
-          title={isRecording ? t("titleStopRecording") : t("titleStartRecording")}
-        >
-          {isRecording ? "🛑" : "🎙️"}
-        </button>
+      <div className="mic-wrapper" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+          <button
+            className={`mic-btn ${isRecording ? "recording" : ""}`}
+            onClick={handleToggleRecord}
+            title={isRecording ? t("titleStopRecording") : t("titleStartRecording")}
+          >
+            {isRecording ? "🛑" : "🎙️"}
+          </button>
+          
+          {!isRecording && (
+            <button
+              onClick={simulateSpeaking}
+              style={{
+                borderRadius: "50%",
+                width: "48px",
+                height: "48px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "1.2rem",
+                background: "rgba(20, 184, 166, 0.08)",
+                border: "1px dashed hsl(var(--primary-teal))",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.03)",
+                cursor: "pointer",
+                transition: "transform 0.2s"
+              }}
+              title="Mô phỏng phát âm (Dành cho nơi ồn ào/Không tiện nói)"
+              onMouseEnter={(e) => e.target.style.transform = "scale(1.08)"}
+              onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+            >
+              🤫
+            </button>
+          )}
+        </div>
         <span className="mic-btn-label">
           {isRecording ? t("labelListeningSpoken") : t("labelClickToRecord")}
         </span>
@@ -576,8 +604,19 @@ export default function SkillSpeaking({
       )}
 
       {errorMsg && (
-        <div style={{ color: "hsl(var(--danger-red))", fontWeight: 700, fontSize: "0.85rem", textAlign: "center" }}>
-          ⚠️ {errorMsg}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "15px" }}>
+          <div style={{ color: "hsl(var(--danger-red))", fontWeight: 700, fontSize: "0.85rem", textAlign: "center", maxWidth: "450px", lineHeight: "1.4" }}>
+            ⚠️ {errorMsg.includes("network") 
+              ? "Lỗi mạng: Không kết nối được dịch vụ nhận dạng của Google. Vui lòng kiểm tra kết nối mạng hoặc click nút 🤫 bên cạnh micro để dùng chế độ tự động."
+              : errorMsg}
+          </div>
+          <button
+            className="btn btn-secondary"
+            onClick={simulateSpeaking}
+            style={{ padding: "6px 16px", fontSize: "0.75rem", borderRadius: "8px", background: "rgba(20, 184, 166, 0.06)", border: "1px solid hsl(var(--primary-teal))", color: "hsl(var(--primary-teal-dark))" }}
+          >
+            🤖 Chuyển sang mô phỏng phát âm mẫu
+          </button>
         </div>
       )}
 
