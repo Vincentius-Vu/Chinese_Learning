@@ -200,6 +200,23 @@ export default function SkillSpeaking({
         setModelStatus("ready");
         setIsRecording(false);
         setErrorMsg(`Lỗi AI Whisper: ${error}`);
+        
+        // Auto-clear corrupted browser cache storage in the background to self-heal
+        try {
+          if (typeof caches !== "undefined") {
+            caches.keys().then((keys) => {
+              keys.forEach((key) => {
+                if (key.includes("transformer")) {
+                  caches.delete(key).then(() => {
+                    console.log("Automatically cleared outdated/corrupted AI cache:", key);
+                  });
+                }
+              });
+            });
+          }
+        } catch (e) {
+          console.warn("Failed to auto-clear CacheStorage", e);
+        }
       }
     };
 
@@ -684,16 +701,44 @@ export default function SkillSpeaking({
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", marginTop: "15px" }}>
           <div style={{ color: "hsl(var(--danger-red))", fontWeight: 700, fontSize: "0.85rem", textAlign: "center", maxWidth: "450px", lineHeight: "1.4" }}>
             ⚠️ {errorMsg.includes("network") 
-              ? "Lỗi mạng: Không kết nối được dịch vụ nhận dạng của Google. Vui lòng kiểm tra kết nối mạng hoặc click nút 🤫 bên cạnh micro để dùng chế độ tự động."
+              ? "Lỗi mạng: Không kết nối được dịch vụ nhận dạng của Google. Vui lòng kiểm tra kết nối mạng."
+              : errorMsg.includes("session") || errorMsg.includes("Whisper")
+              ? "Lỗi bộ nhớ đệm AI (Corrupted Cache): Trình duyệt đang lưu bản nén lượng tử hóa bị lỗi cũ."
               : errorMsg}
           </div>
-          <button
-            className="btn btn-secondary"
-            onClick={simulateSpeaking}
-            style={{ padding: "6px 16px", fontSize: "0.75rem", borderRadius: "8px", background: "rgba(20, 184, 166, 0.06)", border: "1px solid hsl(var(--primary-teal))", color: "hsl(var(--primary-teal-dark))" }}
-          >
-            🤖 Chuyển sang mô phỏng phát âm mẫu
-          </button>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                if (typeof caches !== "undefined") {
+                  caches.keys().then((keys) => {
+                    Promise.all(keys.map(key => {
+                      if (key.includes("transformer")) {
+                        return caches.delete(key);
+                      }
+                      return Promise.resolve();
+                    })).then(() => {
+                      window.location.reload();
+                    });
+                  }).catch(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  window.location.reload();
+                }
+              }}
+              style={{ padding: "8px 16px", fontSize: "0.75rem", borderRadius: "8px", background: "hsl(var(--secondary-indigo))", color: "white" }}
+            >
+              🔄 Sửa lỗi tự động (Dọn dẹp & Thử lại)
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={simulateSpeaking}
+              style={{ padding: "8px 16px", fontSize: "0.75rem", borderRadius: "8px", background: "rgba(20, 184, 166, 0.06)", border: "1px solid hsl(var(--primary-teal))", color: "hsl(var(--primary-teal-dark))" }}
+            >
+              🤖 Bỏ qua & Chuyển mô phỏng
+            </button>
+          </div>
         </div>
       )}
 
