@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { readingData } from "../data/vocabulary";
 import ZenWatercolorCover from "./ZenWatercolorCover";
+import { speakText } from "../lib/tts";
 
 export default function SkillReading({
   mode,
@@ -107,34 +108,14 @@ export default function SkillReading({
 
   // Speak vocabulary or full sentences using SpeechSynthesis
   const handleSpeak = (text) => {
-    if (!window.speechSynthesis) {
-      triggerMascot(t("speechNotSupported"), "sad");
-      return;
-    }
-    
-    // Safely cancel only if already speaking to avoid iOS deadlock
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
     const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
-    utterance.lang = targetLang;
-    utterance.rate = 0.85; // slightly slower for beginners
-    
-    // Select correct Chinese voice dynamically (crucial for mobile/iOS Safari)
-    try {
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find(v => v.lang.toLowerCase() === targetLang.toLowerCase() || v.lang.toLowerCase().replace("_", "-") === targetLang.toLowerCase()) || 
-                      voices.find(v => v.lang.toLowerCase().startsWith("zh"));
-      if (zhVoice) {
-        utterance.voice = zhVoice;
+    speakText(text, {
+      lang: targetLang,
+      rate: 0.85,
+      onError: () => {
+        if (triggerMascot) triggerMascot(t("speechNotSupported"), "sad");
       }
-    } catch (e) {
-      console.warn("Failed to find voice dynamically", e);
-    }
-    
-    window.speechSynthesis.speak(utterance);
+    });
   };
 
   // Process option selection in reading quizzes

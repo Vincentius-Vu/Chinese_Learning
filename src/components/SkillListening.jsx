@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { listeningData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
+import { speakText } from "../lib/tts";
 
 export default function SkillListening({
   mode,
@@ -158,34 +159,17 @@ export default function SkillListening({
 
   // Play Speech Synthesis TTS audio
   const handlePlayAudio = (rate = 0.9) => {
-    if (!window.speechSynthesis) {
-      triggerMascot(t("speechNotSupported") || "Trình duyệt của bạn không hỗ trợ tổng hợp giọng nói.", "sad");
-      return;
-    }
-    
-    // Safely cancel only if already speaking to avoid iOS deadlock
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(targetText);
     const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
-    utterance.lang = targetLang;
-    utterance.rate = rate;
     
-    // Select correct Chinese voice dynamically (crucial for mobile/iOS Safari)
-    try {
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find(v => v.lang.toLowerCase() === targetLang.toLowerCase() || v.lang.toLowerCase().replace("_", "-") === targetLang.toLowerCase()) || 
-                      voices.find(v => v.lang.toLowerCase().startsWith("zh"));
-      if (zhVoice) {
-        utterance.voice = zhVoice;
+    speakText(targetText, {
+      lang: targetLang,
+      rate: rate,
+      onError: () => {
+        if (triggerMascot) {
+          triggerMascot(t("speechNotSupported") || "Trình duyệt của bạn không hỗ trợ tổng hợp giọng nói.", "sad");
+        }
       }
-    } catch (e) {
-      console.warn("Failed to find voice dynamically", e);
-    }
-    
-    window.speechSynthesis.speak(utterance);
+    });
     
     if (rate < 0.7) {
       triggerMascot(t("mascotListeningSlow") || "Chế độ rùa 🐢 đang phát âm chậm rãi từng chữ một, hãy chú ý nghe rõ nhé!", "thinking");

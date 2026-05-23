@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { writingData } from "../data/vocabulary";
 import { sinoVietMap } from "../data/sinoVietMap";
 import { etymologyData, radicalsList } from "../data/etymologyData";
+import { speakText } from "../lib/tts";
 
 export default function DictionaryModal({
   isOpen,
@@ -104,12 +105,11 @@ export default function DictionaryModal({
 
   // Audio vocalizer using HTML5 Web Speech Synthesis API
   const handleSpeak = (text) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = mode === "simplified" ? "zh-CN" : "zh-TW";
-    utterance.rate = 0.8;
-    window.speechSynthesis.speak(utterance);
+    const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
+    speakText(text, {
+      lang: targetLang,
+      rate: 0.8
+    });
   };
 
   // Helper to extract radicals for selected character

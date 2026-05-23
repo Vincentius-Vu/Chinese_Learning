@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { sinoVietMap } from "../data/sinoVietMap";
 import { typingData } from "../data/typingData";
+import { speakText } from "../lib/tts";
 export default function SkillFlashcards({
   mode,
   selectedLevel,
@@ -123,30 +124,11 @@ export default function SkillFlashcards({
 
   // TTS Voice Synthesis
   const speakHanzi = (text) => {
-    if (!window.speechSynthesis) return;
-    
-    // Safely cancel only if already speaking to avoid iOS deadlock
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "zh-CN";
-    utterance.rate = 0.85;
-    
-    // Select correct Chinese voice dynamically (crucial for mobile/iOS Safari)
-    try {
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find(v => v.lang.toLowerCase() === "zh-cn" || v.lang.toLowerCase().replace("_", "-") === "zh-cn") || 
-                      voices.find(v => v.lang.toLowerCase().startsWith("zh"));
-      if (zhVoice) {
-        utterance.voice = zhVoice;
-      }
-    } catch (e) {
-      console.warn("Failed to find voice dynamically", e);
-    }
-    
-    window.speechSynthesis.speak(utterance);
+    const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
+    speakText(text, {
+      lang: targetLang,
+      rate: 0.85
+    });
   };
 
   // Handle deck selection and creation

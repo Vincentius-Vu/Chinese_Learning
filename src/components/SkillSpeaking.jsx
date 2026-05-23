@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { speakingData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
+import { speakText } from "../lib/tts";
 
 // ── Pinyin & Levenshtein Helper Functions for Homophone-Resistant Matching ──
 let charPinyinLookup = null;
@@ -324,31 +325,13 @@ export default function SkillSpeaking({
 
   // Play target voice sample
   const handlePlaySample = () => {
-    if (!window.speechSynthesis) return;
-    
-    // Safely cancel only if already speaking to avoid iOS deadlock
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
-    }
-    
-    const utterance = new SpeechSynthesisUtterance(targetText);
     const targetLang = mode === "simplified" ? "zh-CN" : "zh-TW";
-    utterance.lang = targetLang;
-    utterance.rate = 0.85;
     
-    // Select correct Chinese voice dynamically (crucial for mobile/iOS Safari)
-    try {
-      const voices = window.speechSynthesis.getVoices();
-      const zhVoice = voices.find(v => v.lang.toLowerCase() === targetLang.toLowerCase() || v.lang.toLowerCase().replace("_", "-") === targetLang.toLowerCase()) || 
-                      voices.find(v => v.lang.toLowerCase().startsWith("zh"));
-      if (zhVoice) {
-        utterance.voice = zhVoice;
-      }
-    } catch (e) {
-      console.warn("Failed to find voice dynamically", e);
-    }
+    speakText(targetText, {
+      lang: targetLang,
+      rate: 0.85
+    });
     
-    window.speechSynthesis.speak(utterance);
     triggerMascot(t("mascotSpeakingModelDemo"), "thinking");
   };
 
