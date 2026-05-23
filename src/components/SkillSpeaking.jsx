@@ -3,6 +3,7 @@ import { speakingData } from "../data/vocabulary";
 import { getAdaptiveVocabulary } from "../lib/adaptiveLearning";
 import { speakText } from "../lib/tts";
 import { AudioRecorder } from "../lib/audioHelper";
+import WhisperWorker from "../lib/whisper.worker.js?worker";
 
 // ── Pinyin & Levenshtein Helper Functions for Homophone-Resistant Matching ──
 let charPinyinLookup = null;
@@ -173,8 +174,8 @@ export default function SkillSpeaking({
         setHasMicSupport(false);
       });
 
-    // Load Whisper Web Worker (Vite's URL imports are standard and clean)
-    const worker = new Worker(new URL("../lib/whisper.worker.js", import.meta.url), { type: "module" });
+    // Load Whisper Web Worker via Vite's robust worker bundler query
+    const worker = new WhisperWorker();
     workerRef.current = worker;
 
     worker.onmessage = (event) => {
