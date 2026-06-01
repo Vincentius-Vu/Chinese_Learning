@@ -117,25 +117,26 @@ export default function GoogleSync({ currentData, onDataRestored, t }) {
     <div className="google-sync-container" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
       {!accessToken ? (
         <button 
-          className="sync-btn" 
+          className="btn btn-ghost" 
           onClick={() => login()} 
           title={t ? t("btnLoginGoogle") : "Đăng nhập để đồng bộ"}
           style={{
-            display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '6px 12px',
-            borderRadius: '20px', cursor: 'pointer', fontSize: '0.85rem'
+            display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px',
+            borderRadius: 'var(--radius-md)', fontSize: '0.85rem', width: '100%', justifyContent: 'center'
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2 C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.761H12.545z"/></svg>
-          Sync
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032 s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2 C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.761H12.545z"/></svg>
+          Google Sync
         </button>
       ) : (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '20px' }}>
-          {userInfo && <img src={userInfo.picture} alt="avatar" style={{ width: 22, height: 22, borderRadius: '50%' }} />}
-          <span style={{ fontSize: '0.8rem', color: syncStatus === 'error' ? '#ff6b6b' : syncStatus === 'syncing' ? '#ffd93d' : '#4dabf7' }}>
-            {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'error' ? 'Sync Error' : 'Synced'}
-          </span>
-          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', fontSize: '0.8rem', opacity: 0.7 }}>Thoát</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.05)', padding: '6px 12px', borderRadius: 'var(--radius-md)', width: '100%', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {userInfo && <img src={userInfo.picture} alt="avatar" style={{ width: 24, height: 24, borderRadius: '50%' }} />}
+            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: syncStatus === 'error' ? 'hsl(var(--danger-red))' : syncStatus === 'syncing' ? 'hsl(var(--accent-orange))' : 'hsl(var(--primary-teal-dark))' }}>
+              {syncStatus === 'syncing' ? 'Syncing...' : syncStatus === 'error' ? 'Sync Error' : 'Synced'}
+            </span>
+          </div>
+          <button onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'hsl(var(--neutral-gray))', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>Thoát</button>
         </div>
       )}
     </div>
