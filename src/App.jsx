@@ -8,6 +8,7 @@ import SkillSpeaking from "./components/SkillSpeaking";
 import SkillTyping from "./components/SkillTyping";
 import SkillFlashcards from "./components/SkillFlashcards";
 import DictionaryModal from "./components/DictionaryModal";
+import GoogleSync from "./components/GoogleSync";
 import { translations } from "./data/translations";
 import { writingData } from "./data/vocabulary";
 import { hskCompoundWords } from "./data/hskCompoundWords";
@@ -200,24 +201,7 @@ export default function App() {
       try {
         const data = JSON.parse(event.target.result);
         if (data && typeof data === "object") {
-          if (data.chinese_xp !== undefined) localStorage.setItem("chinese_xp", Number(data.chinese_xp));
-          if (data.chinese_streak !== undefined) localStorage.setItem("chinese_streak", Number(data.chinese_streak));
-          if (data.chinese_mode !== undefined) localStorage.setItem("chinese_mode", data.chinese_mode);
-          if (data.chinese_skill !== undefined) localStorage.setItem("chinese_skill", data.chinese_skill);
-          if (data.chinese_selected_level !== undefined) localStorage.setItem("chinese_selected_level", Number(data.chinese_selected_level));
-          if (data.chinese_sound !== undefined) localStorage.setItem("chinese_sound", JSON.stringify(data.chinese_sound));
-          if (data.chinese_ui_lang !== undefined) localStorage.setItem("chinese_ui_lang", data.chinese_ui_lang);
-          if (data.chinese_custom_words !== undefined && Array.isArray(data.chinese_custom_words)) {
-            localStorage.setItem("chinese_custom_words", JSON.stringify(data.chinese_custom_words));
-          }
-          if (data.chinese_mastery !== undefined) {
-            localStorage.setItem("chinese_mastery", JSON.stringify(data.chinese_mastery));
-          }
-          if (data.chinese_review_logs !== undefined) {
-            localStorage.setItem("chinese_review_logs", JSON.stringify(data.chinese_review_logs));
-          }
-          alert(t("backupRestoreSuccess") || "Khôi phục dữ liệu học tập thành công! Trang web sẽ tải lại.");
-          window.location.reload();
+          handleDataRestored(data);
         } else {
           alert(t("backupRestoreInvalid") || "Tệp sao lưu không hợp lệ.");
         }
@@ -226,6 +210,41 @@ export default function App() {
       }
     };
     reader.readAsText(file);
+  };
+
+  const handleDataRestored = (data) => {
+    if (data && typeof data === "object") {
+      if (data.chinese_xp !== undefined) localStorage.setItem("chinese_xp", Number(data.chinese_xp));
+      if (data.chinese_streak !== undefined) localStorage.setItem("chinese_streak", Number(data.chinese_streak));
+      if (data.chinese_mode !== undefined) localStorage.setItem("chinese_mode", data.chinese_mode);
+      if (data.chinese_skill !== undefined) localStorage.setItem("chinese_skill", data.chinese_skill);
+      if (data.chinese_selected_level !== undefined) localStorage.setItem("chinese_selected_level", Number(data.chinese_selected_level));
+      if (data.chinese_sound !== undefined) localStorage.setItem("chinese_sound", JSON.stringify(data.chinese_sound));
+      if (data.chinese_ui_lang !== undefined) localStorage.setItem("chinese_ui_lang", data.chinese_ui_lang);
+      if (data.chinese_custom_words !== undefined && Array.isArray(data.chinese_custom_words)) {
+        localStorage.setItem("chinese_custom_words", JSON.stringify(data.chinese_custom_words));
+      }
+      if (data.chinese_mastery !== undefined) {
+        localStorage.setItem("chinese_mastery", JSON.stringify(data.chinese_mastery));
+      }
+      if (data.chinese_review_logs !== undefined) {
+        localStorage.setItem("chinese_review_logs", JSON.stringify(data.chinese_review_logs));
+      }
+      window.location.reload();
+    }
+  };
+
+  const currentData = {
+    chinese_xp: xp,
+    chinese_streak: streak,
+    chinese_mode: mode,
+    chinese_skill: activeSkill,
+    chinese_selected_level: selectedLevel,
+    chinese_sound: soundOn,
+    chinese_ui_lang: uiLang,
+    chinese_custom_words: customWords,
+    chinese_mastery: mastery,
+    chinese_review_logs: reviewLogs
   };
   
   // Mascot Speech Bubble and Mood Control
@@ -512,8 +531,14 @@ export default function App() {
         <div className="main-grid">
           {/* Sidebar Menu */}
           <aside className="sidebar-panel glass-panel">
-            <h2 className="sidebar-title">{t("sidebarTitle")}</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h2 className="sidebar-title" style={{ margin: 0 }}>{t("sidebarTitle")}</h2>
+            </div>
             
+            <div style={{ marginBottom: "20px" }}>
+              <GoogleSync currentData={currentData} onDataRestored={handleDataRestored} t={t} />
+            </div>
+
             <button
               className={`nav-card ${activeSkill === "writing" ? "active" : ""}`}
               onClick={() => setActiveSkill("writing")}
