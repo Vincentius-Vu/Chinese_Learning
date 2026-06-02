@@ -6,7 +6,7 @@ export async function findBackupFile(accessToken) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
-  if (!response.ok) throw new Error("Failed to find backup file");
+  if (!response.ok) throw new Error(`[${response.status}] Failed to find backup file`);
   const data = await response.json();
   return data.files && data.files.length > 0 ? data.files[0] : null;
 }
@@ -16,7 +16,7 @@ export async function downloadBackup(accessToken, fileId) {
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
-  if (!response.ok) throw new Error("Failed to download backup");
+  if (!response.ok) throw new Error(`[${response.status}] Failed to download backup`);
   return await response.json();
 }
 
@@ -52,6 +52,6 @@ export async function uploadBackup(accessToken, fileData, existingFileId = null)
     body: form
   });
 
-  if (!response.ok) throw new Error("Failed to create or update backup");
+  if (!response.ok) throw new Error(`[${response.status}] Failed to create or update backup`);
   return await response.json();
 }

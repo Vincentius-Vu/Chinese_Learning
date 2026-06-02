@@ -84,8 +84,10 @@ export default function GoogleSync({ currentData, onDataRestored, t }) {
         }
       } catch (err) {
         console.error("Sync error:", err);
-        if (err.message.includes("401")) handleLogout(); // token expired
-        else if (isMounted) setSyncStatus("error");
+        if (err.message.includes("401")) {
+          alert("Phiên đăng nhập Google đã hết hạn. Vui lòng đăng nhập lại để tiếp tục đồng bộ.");
+          handleLogout(); // token expired
+        } else if (isMounted) setSyncStatus("error");
       }
     };
 
@@ -105,10 +107,12 @@ export default function GoogleSync({ currentData, onDataRestored, t }) {
         setSyncStatus("success");
       } catch (err) {
         console.error("Auto-sync error:", err);
-        if (err.message.includes("401")) handleLogout();
-        else setSyncStatus("error");
+        if (err.message.includes("401")) {
+          alert("Phiên đăng nhập Google đã hết hạn. Vui lòng đăng nhập lại để tiếp tục đồng bộ.");
+          handleLogout();
+        } else setSyncStatus("error");
       }
-    }, 5000); // 5s debounce
+    }, 60000); // 60s debounce
 
     return () => clearTimeout(timer);
   }, [currentData, accessToken]);
