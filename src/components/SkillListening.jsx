@@ -45,22 +45,25 @@ export default function SkillListening({
     }
 
     return targetWords.map((target) => {
-      const correctTranslation = target.translation;
+      const useChineseOptions = selectedLevel >= 4;
+      const correctChoice = useChineseOptions 
+        ? (mode === "simplified" ? target.simplified : target.traditional) 
+        : target.translation;
 
-      // Distractor candidates (excluding the target correct answer)
+      // Distractor candidates (excluding the target)
       const distractorCandidates = vocabPool.filter(
-        (item) => item.translation !== correctTranslation && item.translation.trim() !== ""
+        (item) => item.id !== target.id && item.translation.trim() !== ""
       );
+
+      const getChoiceVal = (cand) => useChineseOptions ? (mode === "simplified" ? cand.simplified : cand.traditional) : cand.translation;
 
       let distractors = [];
       if (masteryVal >= 1400) {
         // HARD: Prioritize similar distractors
         const similarDistractors = distractorCandidates.filter((item) => {
-          // Check if they share any character
           for (const char of target.simplified || "") {
             if (item.simplified && item.simplified.includes(char)) return true;
           }
-          // Check if Pinyin sounds similar (e.g. shares first 2 chars of pinyin)
           if (target.pinyin && item.pinyin) {
             const pyA = target.pinyin.toLowerCase().replace(/[^a-z]/g, "");
             const pyB = item.pinyin.toLowerCase().replace(/[^a-z]/g, "");
@@ -69,14 +72,13 @@ export default function SkillListening({
           return false;
         });
 
-        // Mix in some similar distractors, then fill with general distractors of the same level
         const levelDistractors = distractorCandidates.filter((item) => item.level === selectedLevel);
         const candidates = [...similarDistractors, ...levelDistractors, ...distractorCandidates];
         
         const uniqueDist = new Set();
         for (const cand of candidates) {
           if (uniqueDist.size >= numChoices - 1) break;
-          uniqueDist.add(cand.translation);
+          uniqueDist.add(getChoiceVal(cand));
         }
         distractors = Array.from(uniqueDist);
       } else if (masteryVal >= 1100) {
@@ -87,7 +89,7 @@ export default function SkillListening({
         const uniqueDist = new Set();
         for (const cand of candidates) {
           if (uniqueDist.size >= numChoices - 1) break;
-          uniqueDist.add(cand.translation);
+          uniqueDist.add(getChoiceVal(cand));
         }
         distractors = Array.from(uniqueDist);
       } else {
@@ -98,18 +100,18 @@ export default function SkillListening({
         const uniqueDist = new Set();
         for (const cand of candidates) {
           if (uniqueDist.size >= numChoices - 1) break;
-          uniqueDist.add(cand.translation);
+          uniqueDist.add(getChoiceVal(cand));
         }
         distractors = Array.from(uniqueDist);
       }
 
       // Safe fallback if not enough distractors
       while (distractors.length < numChoices - 1) {
-        distractors.push("Đáp án gây nhiễu " + (distractors.length + 1));
+        distractors.push(useChineseOptions ? "选项 " + (distractors.length + 1) : "Đáp án gây nhiễu " + (distractors.length + 1));
       }
 
       // Mix correct answer with distractors and shuffle
-      const choices = [correctTranslation, ...distractors].sort(() => 0.5 - Math.random());
+      const choices = [correctChoice, ...distractors].sort(() => 0.5 - Math.random());
 
       return {
         id: `vocab_listen_${target.id}_${Math.random().toString(36).substr(2, 9)}`,
@@ -120,13 +122,28 @@ export default function SkillListening({
         pinyin: target.pinyin,
         translation: target.translation,
         sinoViet: target.sinoViet || "",
-        choices: choices
+        choices: choices,
+        correctChoice: correctChoice
       };
     });
   };
 
   // Filter based on selectedLevel for Sentence mode
-  const filteredListeningData = listeningData.filter((item) => item.level === selectedLevel);
+  const filteredListeningData = listeningData.filter((item) => item.level === selectedLevel).map(q => {
+    const useChineseOptions = selectedLevel >= 4;
+    if (useChineseOptions) {
+      const correctChoice = mode === "simplified" ? q.simplified : q.traditional;
+      const others = listeningData.filter(x => x.level === selectedLevel && x.id !== q.id);
+      const shuffledOthers = [...others].sort(() => 0.5 - Math.random()).slice(0, 3);
+      const distractors = shuffledOthers.map(x => mode === "simplified" ? x.simplified : x.traditional);
+      while (distractors.length < 3) {
+         distractors.push(mode === "simplified" ? "其他选项" : "其他選項");
+      }
+      const choices = [correctChoice, ...distractors].sort(() => 0.5 - Math.random());
+      return { ...q, choices, correctChoice };
+    }
+    return { ...q, correctChoice: q.translation };
+  });
 
   // Active exercises pool
   const activeQuizzes = exerciseMode === "vocab" ? vocabQuizzes : filteredListeningData;
@@ -188,7 +205,7 @@ export default function SkillListening({
     if (selectedOption === null || isAnswered) return;
     
     setIsAnswered(true);
-    const isCorrect = selectedOption === activeQuestion.translation;
+    const isCorrect = selectedOption === (activeQuestion.correctChoice || activeQuestion.translation);
 
     // Log this vocabulary item review result
     if (addReviewLogs && activeQuestion && exerciseMode === "vocab") {
@@ -212,9 +229,10 @@ export default function SkillListening({
     } else {
       playSound("wrong");
       
-      let mascotMsg = t("mascotListeningWrong")?.replace("{answer}", activeQuestion.translation) || `Tiếc quá! Câu trả lời chính xác phải là: "${activeQuestion.translation}". Hãy thử nghe lại nhé! 🐃`;
+      let correctStr = activeQuestion.correctChoice || activeQuestion.translation;
+      let mascotMsg = t("mascotListeningWrong")?.replace("{answer}", correctStr) || `Tiếc quá! Câu trả lời chính xác phải là: "${correctStr}". Hãy thử nghe lại nhé! 🐃`;
       if (exerciseMode === "vocab" && activeQuestion.sinoViet) {
-        mascotMsg = `Tiếc quá! Đáp án đúng cho từ "${targetText}" (${activeQuestion.pinyin} - Hán Việt: "${activeQuestion.sinoViet}") phải là: "${activeQuestion.translation}". Hãy luyện nghe lại nhé! 🐃`;
+        mascotMsg = `Tiếc quá! Đáp án đúng cho từ "${targetText}" (${activeQuestion.pinyin} - Hán Việt: "${activeQuestion.sinoViet}") phải là: "${correctStr}". Hãy luyện nghe lại nhé! 🐃`;
       }
       triggerMascot(mascotMsg, "sad");
     }
@@ -416,7 +434,8 @@ export default function SkillListening({
         {activeQuestion.choices.map((choice, oIdx) => {
           let optionClass = "";
           if (isAnswered) {
-            if (choice === activeQuestion.translation) optionClass = "correct";
+            const correctStr = activeQuestion.correctChoice || activeQuestion.translation;
+            if (choice === correctStr) optionClass = "correct";
             else if (choice === selectedOption) optionClass = "wrong";
           } else if (choice === selectedOption) {
             optionClass = "selected";
@@ -447,7 +466,9 @@ export default function SkillListening({
             {activeQuestion.sinoViet && (
               <div><strong>Hán-Việt:</strong> <span className="listening-sinoviet-badge">{activeQuestion.sinoViet}</span></div>
             )}
-            <div><strong>Ý nghĩa:</strong> <span>{activeQuestion.translation}</span></div>
+            {selectedLevel < 4 && (
+              <div><strong>Ý nghĩa:</strong> <span>{activeQuestion.translation}</span></div>
+            )}
           </div>
         </div>
       )}

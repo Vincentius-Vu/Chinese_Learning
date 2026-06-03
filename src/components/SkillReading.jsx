@@ -216,7 +216,7 @@ export default function SkillReading({
                   onClick={() => setSelectedStoryId(story.id)}
                 >
                   <div className="story-card-title">{activeTitle}</div>
-                  <div className="story-card-desc">{story.translationTitle}</div>
+                  {selectedLevel < 4 && <div className="story-card-desc">{story.translationTitle}</div>}
                 </div>
               );
             })}
@@ -299,7 +299,7 @@ export default function SkillReading({
             <span className="cover-badge">{t("levelPrefix")} {activeStory.level}</span>
             <h2 className="cover-title-zh">{storyTitle}</h2>
             <span className="cover-title-pinyin">{activeStory.pinyinTitle || ""}</span>
-            <span className="cover-title-vi">{activeStory.translationTitle || ""}</span>
+            {selectedLevel < 4 && <span className="cover-title-vi">{activeStory.translationTitle || ""}</span>}
           </div>
 
           {/* Interactive Story Content */}
@@ -309,10 +309,12 @@ export default function SkillReading({
         </div>
 
         {/* Translation Card Drawer */}
-        <div className="translation-drawer">
-          <div className="translation-drawer-title">{t("labelTranslation")}</div>
-          <div className="translation-drawer-body">{activeStory.translationText}</div>
-        </div>
+        {selectedLevel < 4 && (
+          <div className="translation-drawer">
+            <div className="translation-drawer-title">{t("labelTranslation")}</div>
+            <div className="translation-drawer-body">{activeStory.translationText}</div>
+          </div>
+        )}
 
         {/* Comprehension Quiz section */}
         <div className="quiz-section">
